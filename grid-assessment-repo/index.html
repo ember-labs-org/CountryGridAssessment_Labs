@@ -1,0 +1,635 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Country grid assessment (trial data)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Ember Labs dark theme. Tokens from the ember-labs-branding skill (colour-tokens.md). */
+:root{
+  --el-navy:#192238; --el-canvas:#414F6F; --el-slate:#626E88; --el-black:#000000; --el-white:#FFFFFF;
+  --el-yellow:#FFC400; --el-orange:#E04B00; --el-green:#13CE74; --el-blue:#37A6E6; --el-blue-light:#97CCED;
+  --el-muted:#B0B7C6; --el-cat-5:#C4D9E9;
+  --el-divider:rgba(255,255,255,0.12); --el-wash:rgba(255,255,255,0.08); --el-yellow-hover:#E6B300;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+html{background:var(--el-black);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;background:var(--el-canvas);color:var(--el-white);
+  font-family:'Poppins',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  font-weight:400;font-size:16px;line-height:1.4;text-align:left;
+}
+p{margin:0}
+h1,h2,h3,h4{font-weight:600;margin:0;line-height:1.15}
+strong,b{font-weight:600}
+
+/* nav, hero, footer */
+.el-nav{background:var(--el-black);padding:calc(18px + env(safe-area-inset-top,0px)) 32px 18px;display:flex;align-items:center}
+.el-logo-mark{height:34px;width:auto;display:block}
+.el-hero{background:var(--el-navy);padding:48px 32px 44px;display:flex;flex-direction:column;align-items:flex-start}
+.el-badge{display:inline-flex;align-items:center;gap:8px;background:var(--el-yellow);color:#000;font-weight:600;font-size:14px;padding:6px 12px;margin-bottom:20px}
+.el-badge .el-icon{width:14px;height:14px}
+.el-hero h1{font-size:clamp(30px,5vw,42px);margin-bottom:10px}
+.el-hero-subtitle{color:var(--el-muted);font-size:18px;margin-top:8px;max-width:70ch}
+.el-footer{background:var(--el-navy);padding:32px 32px calc(32px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center}
+.el-logo-foot{height:26px;width:auto;display:block}
+.el-footer p{color:var(--el-muted);font-size:14px}
+
+.wrap{max-width:1240px;margin:0 auto;padding:32px 24px 56px}
+.el-card,.card{background:var(--el-navy)}
+.banner{background:var(--el-navy);border-left:4px solid var(--el-yellow);padding:14px 18px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;margin-bottom:20px}
+.banner .el-badge{margin:0;font-size:13px;padding:4px 10px}
+.banner span.t{flex:1;min-width:260px}
+.lede{margin:0 0 20px;max-width:72ch;font-size:18px}
+.lede p{margin:0}
+.lede p+p{margin-top:14px}
+.lede .def-succ{color:var(--el-yellow)}
+h2{font-size:24px}
+h3{font-size:18px;margin:28px 0 12px}
+
+/* controls */
+.controls{background:var(--el-navy);padding:20px 24px;display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end}
+.ctl{display:flex;flex-direction:column;gap:6px}
+.lab,.ctl label{font-size:13px;font-weight:600;color:var(--el-muted)}
+select{
+  font:inherit;font-size:15px;color:var(--el-white);background:var(--el-canvas);
+  border:1px solid var(--el-muted);padding:8px 32px 8px 12px;min-width:170px;
+}
+.chips,.seg{display:flex;flex-wrap:wrap;gap:6px}
+.chip,.seg button{
+  font:inherit;font-size:14px;font-weight:600;color:var(--el-white);background:transparent;
+  border:1px solid var(--el-muted);padding:8px 14px;cursor:pointer;
+}
+.chip:hover,.seg button:hover{background:var(--el-wash)}
+.chip[aria-pressed="true"],.seg button[aria-pressed="true"]{background:var(--el-yellow);border-color:var(--el-yellow);color:var(--el-navy)}
+.none{font-size:14px;color:var(--el-muted);padding:8px 0}
+.cdesc{margin:12px 0 22px;font-size:14px;color:var(--el-muted);max-width:80ch}
+:focus-visible{outline:3px solid var(--el-yellow);outline-offset:2px}
+svg g[tabindex]{outline:none}
+svg g[tabindex]:focus-visible .focusring{stroke:var(--el-white);stroke-width:4}
+
+/* top layout */
+.top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:880px){.top{grid-template-columns:minmax(0,1fr)}}
+#viz{background:var(--el-navy);padding:24px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--el-muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:12px;height:12px;display:inline-block;background:var(--el-yellow)}
+.sw.hollow{background:var(--el-navy);border:2.5px solid var(--el-yellow)}
+
+/* svg */
+svg.chart{width:100%;height:auto;display:block;overflow:visible}
+.ring{fill:none;stroke:var(--el-divider);stroke-width:1}
+.ring.outer{stroke:var(--el-slate)}
+.ringlab{font-size:10px;fill:var(--el-muted);paint-order:stroke;stroke:var(--el-navy);stroke-width:3px}
+.axisline{stroke:var(--el-slate);stroke-width:1}
+.axisline.sel{stroke:var(--el-yellow);stroke-width:3}
+.axisline.na{stroke-dasharray:4 4}
+.hit{stroke:rgba(0,0,0,0);stroke-width:30;fill:none;pointer-events:stroke;cursor:pointer}
+.alabel{font-size:14px;font-weight:600;fill:var(--el-white);cursor:pointer}
+.alabel.sel{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+.ascore{font-size:12px;fill:var(--el-muted);cursor:pointer}
+.poly{fill:var(--el-yellow);fill-opacity:.16;stroke:var(--el-yellow);stroke-width:2.5;stroke-linejoin:round}
+.cmp{fill:none;stroke-width:2;stroke-dasharray:6 4;stroke-linejoin:round}
+.vtx{stroke:var(--el-navy);stroke-width:2;fill:var(--el-yellow);cursor:pointer}
+.vtx.partial{fill:var(--el-navy);stroke:var(--el-yellow);stroke-width:2.5}
+.dp-label{font-size:14px;font-weight:600;fill:var(--el-white);cursor:pointer}
+.dp-grid{stroke:var(--el-divider);stroke-width:1}
+.dp-tick{font-size:10px;fill:var(--el-muted)}
+.dp-na{font-size:12px;fill:var(--el-muted)}
+
+/* module list */
+ul.mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.mrow{
+  width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;text-align:left;
+  font:inherit;color:var(--el-white);background:var(--el-navy);border:0;
+  border-left:4px solid var(--el-slate);padding:12px 16px;cursor:pointer;
+}
+.mrow:hover{background-image:linear-gradient(var(--el-wash),var(--el-wash))}
+.mrow[aria-pressed="true"]{border-left-color:var(--el-yellow);background-image:linear-gradient(var(--el-wash),var(--el-wash))}
+.mname{font-weight:600;font-size:16px}
+.mscore{font-weight:600;font-size:26px;text-align:right;line-height:1.1;color:var(--el-green)}
+.mscore.na{color:var(--el-muted)}
+.mcov{font-size:12px;color:var(--el-muted)}
+.mrow .pillwrap{text-align:right}
+.delta{display:inline-block;font-size:13px;color:var(--el-white);opacity:.8}
+.mlist-note{font-size:12px;color:var(--el-muted);margin:12px 0 0}
+
+/* sections */
+#profile,#detail{margin-top:40px}
+.acc-btn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;
+  font:inherit;color:var(--el-white);background:var(--el-navy);border:0;border-left:4px solid var(--el-slate);
+  padding:16px 20px;cursor:pointer;
+}
+.acc-btn:hover{background-image:linear-gradient(var(--el-wash),var(--el-wash))}
+.acc-btn[aria-expanded="true"]{border-left-color:var(--el-yellow)}
+.acc-title{display:block;font-size:24px;font-weight:600;line-height:1.15}
+.acc-sub{display:block;font-weight:400;font-size:14px;color:var(--el-muted);margin-top:4px}
+.acc-chev{flex:none;width:22px;height:22px;color:var(--el-yellow);transition:transform .15s}
+.acc-btn[aria-expanded="true"] .acc-chev{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.acc-chev{transition:none}}
+#profile-body{padding-top:4px}
+.def{margin:6px 0;max-width:72ch}
+.meta,.pnote{font-size:14px;color:var(--el-muted);max-width:78ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.card{padding:20px;display:flex;flex-direction:column;gap:10px}
+.card.nodata{border:1px dashed var(--el-slate);color:var(--el-muted)}
+.card h4{font-size:16px;line-height:1.35}
+.card.nodata h4{color:var(--el-muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;border:1px solid var(--el-slate);color:var(--el-muted);padding:0 8px}
+.tag.fut{border-style:dashed}
+.big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.big b{font-weight:600;font-size:34px;line-height:1.1;color:var(--el-green)}
+.big span{font-size:14px;color:var(--el-muted)}
+.dir{font-size:13px;color:var(--el-muted)}
+.spark text{font-size:10px;fill:var(--el-muted)}
+.spark text.v{fill:var(--el-white)}
+.spark text.vs{fill:var(--el-white);font-weight:600;font-size:11px}
+.spark .ln{fill:none;stroke:var(--el-yellow);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.spark .ln.fut{stroke-dasharray:5 4}
+.spark .pt{fill:var(--el-yellow);stroke:var(--el-navy);stroke-width:1.5}
+.spark .pt.fut{fill:var(--el-navy);stroke:var(--el-yellow);stroke-width:2}
+.spark .base{stroke:var(--el-divider);stroke-width:1}
+.spark .bench{stroke:var(--el-muted);stroke-width:1;stroke-dasharray:3 3}
+.bar-track{height:10px;background:var(--el-slate)}
+.bar-fill{height:100%;background:var(--el-yellow)}
+dl.gov{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:14px}
+dl.gov dt{color:var(--el-muted)}
+dl.gov dd{margin:0}
+.rows{font-size:14px;margin:0;display:grid;gap:4px}
+.rows b{font-weight:600}
+
+details.notes{margin-top:48px;background:var(--el-navy);padding:20px 24px;font-size:14px}
+details.notes summary{cursor:pointer;font-weight:600}
+details.notes ol{padding-left:20px;max-width:80ch;color:var(--el-white)}
+details.notes li{margin-bottom:8px}
+
+/* explorer additions */
+a{color:var(--el-blue-light)}
+.desc-sm{font-size:13px;color:var(--el-muted)}
+.strip{display:flex;gap:6px;flex-wrap:wrap}
+.yb{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--el-muted)}
+.yb i{display:block;width:16px;height:16px;border:2px solid var(--el-slate)}
+.yb.on i{background:var(--el-yellow);border-color:var(--el-yellow)}
+.counts{font-size:13px;color:var(--el-white)}
+.counts span{color:var(--el-muted)}
+.sel-s{max-width:100%;min-width:0;width:100%;font-size:13px;padding:6px 28px 6px 10px}
+.link-btn{font:inherit;font-size:14px;font-weight:600;color:var(--el-white);background:transparent;border:1px solid var(--el-muted);padding:7px 12px;cursor:pointer;text-align:left}
+.link-btn:hover{background:var(--el-wash)}
+.link-btn[aria-expanded="true"]{border-color:var(--el-yellow)}
+.tscroll{overflow-x:auto;border:1px solid var(--el-divider);max-height:480px;overflow-y:auto}
+table.dt{border-collapse:collapse;width:100%;min-width:760px;font-size:12px}
+table.dt th{position:sticky;top:0;background:var(--el-navy);text-align:left;font-weight:600;color:var(--el-muted);padding:8px 10px;border-bottom:1px solid var(--el-slate);white-space:nowrap}
+table.dt td{padding:7px 10px;border-bottom:1px solid var(--el-divider);vertical-align:top}
+table.dt td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.dt td.sub{max-width:280px}
+.pbadge{display:inline-block;font-size:11px;border:1px solid var(--el-slate);color:var(--el-muted);padding:0 6px;margin-left:6px;white-space:nowrap}
+.pbadge.flag{border-color:var(--el-orange);color:var(--el-white)}
+.srcline{display:block;color:var(--el-muted);margin-top:2px}
+.iss{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:12px}
+.iss li{border-left:3px solid var(--el-slate);padding:2px 0 2px 10px}
+.iss b{font-weight:600}
+.h4s{font-size:13px;font-weight:600;color:var(--el-muted);margin:14px 0 4px}
+.acc2{margin-top:32px}
+.srcnote{font-size:13px;color:var(--el-muted);max-width:80ch;margin-top:8px}
+
+.mscore{color:var(--el-white)}
+.note-mod{background:var(--el-navy);border-left:4px solid var(--el-slate);padding:12px 16px;font-size:14px;color:var(--el-muted);margin-top:16px;max-width:80ch}
+
+/* six things layout */
+.ov{display:grid;gap:8px}
+.ovh,.ovrow{display:grid;grid-template-columns:minmax(240px,1.6fr) repeat(3,minmax(130px,1fr));gap:12px;align-items:center}
+.ovh{padding:0 16px 0 20px;font-size:13px;font-weight:600;color:var(--el-muted)}
+.ovrow{width:100%;text-align:left;font:inherit;color:var(--el-white);background:var(--el-navy);border:0;border-left:4px solid var(--el-slate);padding:14px 16px;cursor:pointer}
+.ovrow:hover,.ovrow[aria-pressed="true"]{background-image:linear-gradient(var(--el-wash),var(--el-wash))}
+.ovrow[aria-pressed="true"]{border-left-color:var(--el-yellow)}
+.ovx{margin-top:8px;border-left-style:dashed}
+.ovmod{display:block;font-size:12px;color:var(--el-muted)}
+.ovq{display:block;font-weight:600;font-size:15px;line-height:1.3}
+.ovcell{font-size:12px;color:var(--el-muted)}
+.sqs{display:flex;gap:4px;margin-bottom:6px;align-items:center}
+.sq{display:inline-block;width:14px;height:14px;border:2px solid var(--el-slate);vertical-align:middle}
+.sq.hist{background:var(--el-yellow);border-color:var(--el-yellow)}
+.sq.other{border-color:var(--el-yellow)}
+.sq.fb{width:10px;height:10px}
+.legend .sq{margin-right:2px}
+@media (max-width:900px){.ovh{display:none}.ovrow{grid-template-columns:1fr}.ovcell::before{content:attr(data-label) ": ";color:var(--el-white);font-weight:600}.ovx .ovcell::before{content:""}}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start}
+@media (max-width:1050px){.cols{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:20px}
+.col h3{margin:0;font-size:18px;min-height:2.4em}
+table.dt td.sub{min-width:170px;max-width:280px}
+table.dt td.num{min-width:90px}
+.col .desc-sm{margin:-14px 0 0}
+.tpanel{margin-top:32px;background:var(--el-navy);padding:20px 24px}
+.tpanel h3{margin-top:0}
+#overview{margin-bottom:8px}
+.mapnote{margin-top:12px;max-width:80ch}
+
+/* six-things format */
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}
+.jump a{font-size:13px;font-weight:600;color:var(--el-white);text-decoration:none;border:1px solid var(--el-muted);padding:6px 12px;background:transparent}
+.jump a:hover{background:var(--el-wash)}
+.sec{margin-top:40px;scroll-margin-top:16px}
+.sec:first-of-type{margin-top:8px}
+.sechead{margin-bottom:16px}
+.sechead .ovmod{font-size:13px;color:var(--el-muted)}
+.sechead h2{font-size:26px;line-height:1.2;max-width:60ch}
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:stretch}
+@media (max-width:1050px){.cols3{grid-template-columns:minmax(0,1fr)}}
+.colx{background:var(--el-navy);padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.colx h3{margin:0;font-size:17px;line-height:1.25;min-height:2.5em}
+.colx .sub{font-size:13px;color:var(--el-muted);margin:-6px 0 0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;min-height:30px;align-content:flex-start}
+.tabs button{font:inherit;font-size:12px;font-weight:600;color:var(--el-white);background:transparent;border:1px solid var(--el-muted);padding:4px 10px;cursor:pointer}
+.tabs button:hover{background:var(--el-wash)}
+.tabs button[aria-pressed="true"]{background:var(--el-yellow);border-color:var(--el-yellow);color:var(--el-navy)}
+.mtitle{font-size:15px;font-weight:600;line-height:1.3;margin:4px 0 0;min-height:2.6em}
+.munit{font-size:12px;color:var(--el-muted);margin:-6px 0 0;min-height:2.8em}
+.capt{font-size:13px;color:var(--el-white);margin:0}
+.capt.m{color:var(--el-muted)}
+.empty{border:1px dashed var(--el-slate);color:var(--el-muted);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:14px;min-height:250px}
+svg.lc{width:100%;height:auto;display:block;overflow:visible}
+.lc .grid{stroke:var(--el-divider);stroke-width:1}
+.lc .axis{stroke:var(--el-slate);stroke-width:1}
+.lc text{font-size:10px;fill:var(--el-muted)}
+.lc text.val{fill:var(--el-white);font-weight:600;font-size:11px}
+.lc .zone{fill:var(--el-wash)}
+.lc .s1{fill:none;stroke:var(--el-yellow);stroke-width:2.5;stroke-linejoin:round}
+.lc .s2{fill:none;stroke:var(--el-blue);stroke-width:2.5;stroke-linejoin:round}
+.lc .dash{stroke-dasharray:6 4}
+.lc .p1{fill:var(--el-yellow);stroke:var(--el-navy);stroke-width:1.5}
+.lc .p2{fill:var(--el-blue);stroke:var(--el-navy);stroke-width:1.5}
+.lc .h1{fill:var(--el-navy);stroke:var(--el-yellow);stroke-width:2}
+.lc .h2{fill:var(--el-navy);stroke:var(--el-blue);stroke-width:2}
+
+/* summary tiles */
+.sumgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+@media (max-width:900px){.sumgrid{grid-template-columns:minmax(0,1fr)}}
+.sumtile{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;background:var(--el-navy);padding:20px;border-left:4px solid var(--el-slate);color:var(--el-white);text-decoration:none}
+.sumtile:hover{background-image:linear-gradient(var(--el-wash),var(--el-wash))}
+.sumleft{flex:1;min-width:0}
+.sumname{display:block;font-size:15px;font-weight:600;line-height:1.3}
+.sumname .fbt{font-weight:400;color:var(--el-muted)}
+.sumhint{display:block;font-size:13px;color:var(--el-muted);line-height:1.4;margin-top:8px}
+.sumunit{display:block;font-size:12px;color:var(--el-muted);margin-top:8px}
+.sumright{flex:none;max-width:46%;display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:right}
+.sumnum{font-size:34px;font-weight:600;line-height:1;color:var(--el-green)}
+.sumnum.na{color:var(--el-muted)}
+.sumchg{font-size:14px;line-height:1.3}
+.sumtile.nod{border-left-style:dashed}
+.sumtile.nod .sumname,.sumtile.nod .sumchg{color:var(--el-muted)}
+/* collapsible sections + characteristics */
+h2.acc-h{font-size:inherit;margin:0;line-height:1.2}
+.acc-btn .ovmod{display:block;font-size:13px;color:var(--el-muted);margin-bottom:2px}
+.accbody{margin-top:16px}
+.sec{margin-top:16px}
+.sec:first-of-type{margin-top:16px}
+.jump{justify-content:space-between;align-items:center}
+.jl,.allb{display:flex;flex-wrap:wrap;gap:8px}
+.cards5{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+@media (max-width:1050px){.cards5{grid-template-columns:minmax(0,1fr)}}
+.rat{font-size:13px;color:var(--el-muted);margin:-6px 0 0;min-height:2.8em}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--el-slate);color:var(--el-muted);padding:0 8px;margin-top:2px}
+
+/* drop-down indicator chooser */
+.indbox{min-height:64px;display:flex;flex-direction:column;gap:4px;justify-content:flex-start}
+.indlab{font-size:12px;font-weight:600;color:var(--el-muted)}
+.indsel{width:100%;min-width:0;font:inherit;font-size:13px;color:var(--el-white);background:var(--el-canvas);border:1px solid var(--el-muted);padding:8px 28px 8px 10px;text-overflow:ellipsis}
+h2.grp{font-size:22px;margin:36px 0 0;line-height:1.2}
+
+/* drop-down indicator chooser */
+.indbox{min-height:64px;display:flex;flex-direction:column;gap:4px;justify-content:flex-start}
+.indlab{font-size:12px;font-weight:600;color:var(--el-muted)}
+.indsel{width:100%;min-width:0;font:inherit;font-size:13px;color:var(--el-white);background:var(--el-canvas);border:1px solid var(--el-muted);padding:8px 28px 8px 10px;text-overflow:ellipsis}
+h2.grp{font-size:22px;margin:36px 0 0;line-height:1.2}
+
+.lc .col{fill:var(--el-yellow)}.lc .colp{fill:var(--el-navy);stroke:var(--el-yellow);stroke-width:2.5;stroke-dasharray:6 4}
+.lc .s3{fill:none;stroke:var(--el-green);stroke-width:2.5;stroke-linejoin:round}
+.lc .s4{fill:none;stroke:var(--el-orange);stroke-width:2.5;stroke-linejoin:round}
+.lc .p3{fill:var(--el-green);stroke:var(--el-navy);stroke-width:1.5}.lc .p4{fill:var(--el-orange);stroke:var(--el-navy);stroke-width:1.5}
+.lc .h3{fill:var(--el-navy);stroke:var(--el-green);stroke-width:2}.lc .h4{fill:var(--el-navy);stroke:var(--el-orange);stroke-width:2}
+.legend .lg{display:inline-block;width:14px;height:3px;background:var(--el-yellow)}
+.legend .lg.c2{background:var(--el-blue)}.legend .lg.c3{background:var(--el-green)}.legend .lg.c4{background:var(--el-orange)}
+.colx .legend{margin:0}
+details.mnote{font-size:12px;color:var(--el-muted);border-top:1px solid var(--el-divider);padding-top:8px}
+details.mnote summary{cursor:pointer;font-weight:600;color:var(--el-white)}
+details.mnote p{margin-top:6px;overflow-wrap:anywhere}
+.empty{min-height:200px}
+.lede,.el-hero-subtitle{max-width:none}
+</style>
+</head>
+<body>
+<nav class="el-nav"><svg class="el-logo-mark" role="img" aria-label="Ember Labs" viewBox="0 0 1920 870" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <path d="M663.424,387.325L663.424,155.481L579.416,324.045L531.409,324.045L447.401,155.481L447.401,387.325L357.933,387.325L357.933,0.007L455.038,0.007L555.411,202.395L656.33,0.007L752.89,0.007L752.89,387.325L663.424,387.325Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1162.725,288.039C1163.093,303.237 1159.521,318.273 1152.359,331.682C1145.454,344.039 1135.735,354.599 1123.991,362.504C1111.163,371.057 1096.953,377.332 1081.989,381.05C1065.416,385.306 1048.364,387.415 1031.254,387.325L842.504,387.325L842.504,0.007L1057.985,0.007C1070.704,-0.167 1083.268,2.834 1094.535,8.736C1105.214,14.369 1114.67,22.064 1122.355,31.375C1130.075,40.8 1136.076,51.511 1140.083,63.016C1144.233,74.661 1146.355,86.932 1146.358,99.294C1146.403,117.668 1141.604,135.733 1132.446,151.662C1122.944,168.236 1108.287,181.265 1090.714,188.759C1111.562,194.42 1130.033,206.669 1143.36,223.672C1156.873,242.333 1163.698,265.02 1162.725,288.039ZM931.972,76.381L931.972,156.569L1019.796,156.569C1029.434,156.636 1038.765,153.138 1045.984,146.75C1054.187,138.808 1058.396,127.581 1057.438,116.203C1058.133,105.435 1054.498,94.822 1047.346,86.743C1041.074,80.034 1032.256,76.27 1023.073,76.381L931.972,76.381ZM1071.624,270.037C1071.929,258.946 1068.251,248.104 1061.259,239.489C1054.986,231.438 1045.28,226.787 1035.075,226.943L931.972,226.943L931.972,311.498L1031.254,311.498C1042.054,311.83 1052.525,307.68 1060.166,300.041C1067.947,292.045 1072.094,281.184 1071.624,270.037Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1597.051,387.325L1597.051,0.007L1771.619,0.007C1789.1,-0.152 1806.378,3.772 1822.076,11.464C1837.206,18.861 1850.809,29.041 1862.172,41.471C1873.413,53.79 1882.372,68.013 1888.63,83.473C1894.872,98.52 1898.115,114.644 1898.177,130.935C1898.277,154.019 1892.454,176.748 1881.267,196.94C1870.482,216.451 1854.406,232.526 1834.896,243.311L1920,387.327L1819.078,387.327L1744.888,262.402L1686.519,262.402L1686.519,387.325L1597.051,387.325ZM1686.519,184.393L1768.347,184.393C1779.337,184.161 1789.541,178.547 1795.622,169.389C1803.626,158.212 1807.659,144.669 1807.076,130.933C1807.801,116.996 1803.107,103.304 1793.982,92.744C1787.018,84.153 1776.669,78.978 1765.618,78.562L1686.519,78.562L1686.519,184.393Z" style="fill:white;fill-rule:nonzero;"/>
+    <rect x="1231.322" y="308.77" width="272.214" height="78.555" style="fill:white;"/>
+    <rect x="1231.322" y="0.007" width="272.214" height="78.555" style="fill:white;"/>
+    <rect x="1231.16" y="154.388" width="272.214" height="78.555" style="fill:white;"/>
+    <path d="M89.465,78.561L272.291,78.561L272.291,0.007L0,0.007L0,387.323L272.213,387.323L272.213,308.77L89.465,308.77L89.465,232.943L242.171,232.943L242.171,154.388L89.465,154.388L89.465,78.561Z" style="fill:white;fill-rule:nonzero;"/>
+    <rect x="0" y="511.001" width="355.291" height="355.291" style="fill:rgb(255,196,0);"/>
+    <path d="M430.887,866.291L430.887,511.291L456.387,511.291L456.387,843.291L668.387,843.291L668.387,866.291L430.887,866.291Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M832.887,511.291L854.887,511.291L1004.887,866.291L977.887,866.291L928.387,749.291L758.887,749.291L709.387,866.291L681.887,866.291L832.887,511.291ZM921.387,728.291L843.887,542.291L764.887,728.291L921.387,728.291Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1320.387,774.291C1320.387,791.624 1316.137,807.207 1307.637,821.041C1299.137,834.874 1287.637,845.874 1273.137,854.041C1258.637,862.207 1242.554,866.291 1224.887,866.291L1058.887,866.291L1058.887,511.291L1224.387,511.291C1241.054,511.291 1255.47,515.707 1267.637,524.541C1279.804,533.374 1289.137,544.707 1295.637,558.541C1302.137,572.374 1305.387,586.791 1305.387,601.791C1305.387,619.457 1300.887,635.874 1291.887,651.041C1282.887,666.207 1270.387,677.291 1254.387,684.291C1274.72,690.291 1290.804,701.541 1302.637,718.041C1314.47,734.541 1320.387,753.291 1320.387,774.291ZM1294.887,770.791C1294.887,758.124 1291.97,746.291 1286.137,735.291C1280.304,724.291 1272.387,715.291 1262.387,708.291C1252.387,701.291 1241.054,697.791 1228.387,697.791L1084.387,697.791L1084.387,843.291L1224.887,843.291C1237.887,843.291 1249.72,839.874 1260.387,833.041C1271.054,826.207 1279.47,817.207 1285.637,806.041C1291.804,794.874 1294.887,783.124 1294.887,770.791ZM1084.387,534.291L1084.387,676.291L1214.387,676.291C1227.387,676.291 1238.804,672.874 1248.637,666.041C1258.47,659.207 1266.22,650.374 1271.887,639.541C1277.554,628.707 1280.387,617.291 1280.387,605.291C1280.387,592.291 1277.72,580.457 1272.387,569.791C1267.054,559.124 1259.637,550.541 1250.137,544.041C1240.637,537.541 1229.72,534.291 1217.387,534.291L1084.387,534.291Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1596.387,570.291C1590.72,563.957 1584.387,558.374 1577.387,553.541C1570.387,548.707 1562.887,544.707 1554.887,541.541C1546.887,538.374 1538.22,535.957 1528.887,534.291C1519.554,532.624 1509.554,531.791 1498.887,531.791C1464.22,531.791 1438.97,538.374 1423.137,551.541C1407.304,564.707 1399.387,582.457 1399.387,604.791C1399.387,619.791 1402.97,631.707 1410.137,640.541C1417.304,649.374 1428.554,656.457 1443.887,661.791C1459.22,667.124 1479.054,672.291 1503.387,677.291C1529.054,682.624 1551.22,688.874 1569.887,696.041C1588.554,703.207 1602.97,712.957 1613.137,725.291C1623.304,737.624 1628.387,754.291 1628.387,775.291C1628.387,790.957 1625.387,804.707 1619.387,816.541C1613.387,828.374 1604.72,838.124 1593.387,845.791C1582.054,853.457 1568.637,859.291 1553.137,863.291C1537.637,867.291 1520.387,869.291 1501.387,869.291C1483.054,869.291 1465.554,867.291 1448.887,863.291C1432.22,859.291 1416.554,853.457 1401.887,845.791C1387.22,838.124 1373.554,828.291 1360.887,816.291L1374.387,795.791C1381.72,803.791 1389.97,810.874 1399.137,817.041C1408.304,823.207 1418.304,828.457 1429.137,832.791C1439.97,837.124 1451.554,840.541 1463.887,843.041C1476.22,845.541 1489.054,846.791 1502.387,846.791C1533.387,846.791 1557.637,841.041 1575.137,829.541C1592.637,818.041 1601.387,800.957 1601.387,778.291C1601.387,762.624 1597.387,749.957 1589.387,740.291C1581.387,730.624 1569.054,722.707 1552.387,716.541C1535.72,710.374 1514.887,704.624 1489.887,699.291C1464.887,693.957 1443.637,687.957 1426.137,681.291C1408.637,674.624 1395.47,665.624 1386.637,654.291C1377.804,642.957 1373.387,627.624 1373.387,608.291C1373.387,586.957 1378.637,568.874 1389.137,554.041C1399.637,539.207 1414.387,527.957 1433.387,520.291C1452.387,512.624 1474.22,508.791 1498.887,508.791C1514.22,508.791 1528.47,510.291 1541.637,513.291C1554.804,516.291 1566.97,520.874 1578.137,527.041C1589.304,533.207 1599.72,540.957 1609.387,550.291L1596.387,570.291Z" style="fill:white;fill-rule:nonzero;"/>
+</svg></nav>
+<header class="el-hero">
+  <span class="el-badge"><svg class="el-icon" viewBox="0 0 807 922" aria-hidden="true"><path fill="currentColor" d="M489.812,411.479L489.812,86.438L316.938,86.438L316.938,411.479L304.152,432.368L215.554,576.25L591.196,576.25L502.598,432.368L489.812,411.479ZM576.25,86.438L576.25,386.988L806.75,761.55L806.75,922L0,922L0,761.55L230.5,386.988L230.5,86.438L172.875,86.438L172.875,0L633.875,0L633.875,86.438L576.25,86.438Z"/></svg>Prototype</span>
+  <h1>Country grid assessment</h1>
+  <p class="el-hero-subtitle">Grid assessment indicators and country characteristics &bull; trial data for five pilot countries</p>
+</header>
+<main class="wrap">
+  <div class="lede"><p>The state of the grid is assessed by country, based on the following definition of success: <span class="def-succ">the grid is succeeding when it can accommodate changes on the supply and demand sides of the power system in a timely manner to provide clean, abundant, reliable and affordable electricity for all.</span></p><p>This is broken down into six elements - each is assessed in terms of its current state of constraint, the possible driver and level of future risk. A drop-down menu indicates where more than one indicator is available.</p><p>A summary at the top gives the headline constraint metric for each of the six elements assessed. This is followed by key country characteristics that provide important context for interpretation of the figures.</p><p>All sections are collapsible.</p></div>
+  <div class="banner" role="note"><span class="el-badge">Prototype data</span><span class="t">Values are calculated based on the data collected for the grid assessment data tool prototype, with the use of AI and with human review (version 11 Nov 2026). No thresholds or scores. Internal only: do not cite or circulate.</span></div>
+  <section class="controls" id="controls" aria-label="Controls"></section>
+  <p class="cdesc" id="cdesc"></p>
+  <div class="jump" id="jump"></div>
+  <div id="things"></div>
+  <details class="notes">
+    <summary>How the indicators are built from the workbook</summary>
+    <ol>
+      <li><strong>Every value is calculated from the trial data workbook.</strong> Nothing is invented or estimated in this page. Open "How this is calculated" under any chart for the formula and the workbook tabs used.</li>
+      <li><strong>Terminology follows the framework terminology document:</strong> six grid assessment indicators, each with a constraint metric, a possible driver and a future risk, plus six country characteristics.</li>
+      <li><strong>Ratios are calculated here, not in the workbook</strong> (for example curtailment GWh &divide; generation TWh). Where the workbook already holds the ratio (congestion cost per MWh, energy not supplied per TWh, peak-to-demand growth ratio), the stored value is shown.</li>
+      <li><strong>Money is in nominal local currency</strong> (Poland's plan investment is in 2025 prices). Levels are not comparable across countries; trends within a country are.</li>
+      <li><strong>Grid investment for South Korea and Pakistan is not national transmission:</strong> South Korea is KEPCO total capex (includes distribution and non-grid spending) and Pakistan is K-Electric (Karachi) only. Indicators using it are shown with that caveat in the calculation note.</li>
+      <li><strong>Plans vs outturn:</strong> renewables compare plan capacity with installed capacity (levels). Demand compares growth, indexed to each plan's first year, because plan demand definitions differ from Ember's.</li>
+      <li><strong>Projections are dashed, on a shaded band</strong>, with hollow markers. Where a metric compares pathways or plan editions, each has its own line.</li>
+      <li><strong>Gaps are shown, not hidden.</strong> Where the workbook has no data the box reads "Data not reported". An indicator with a single data point is shown as a single column.</li>
+      <li><strong>The summary tiles</strong> show the first constraint metric with data, its latest value and the relative change from the previous data point. No good or bad colouring: no direction or threshold has been agreed.</li>
+    </ol>
+  </details>
+</main>
+<footer class="el-footer"><svg class="el-logo-foot" role="img" aria-label="Ember Labs" viewBox="0 0 1920 870" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <path d="M663.424,387.325L663.424,155.481L579.416,324.045L531.409,324.045L447.401,155.481L447.401,387.325L357.933,387.325L357.933,0.007L455.038,0.007L555.411,202.395L656.33,0.007L752.89,0.007L752.89,387.325L663.424,387.325Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1162.725,288.039C1163.093,303.237 1159.521,318.273 1152.359,331.682C1145.454,344.039 1135.735,354.599 1123.991,362.504C1111.163,371.057 1096.953,377.332 1081.989,381.05C1065.416,385.306 1048.364,387.415 1031.254,387.325L842.504,387.325L842.504,0.007L1057.985,0.007C1070.704,-0.167 1083.268,2.834 1094.535,8.736C1105.214,14.369 1114.67,22.064 1122.355,31.375C1130.075,40.8 1136.076,51.511 1140.083,63.016C1144.233,74.661 1146.355,86.932 1146.358,99.294C1146.403,117.668 1141.604,135.733 1132.446,151.662C1122.944,168.236 1108.287,181.265 1090.714,188.759C1111.562,194.42 1130.033,206.669 1143.36,223.672C1156.873,242.333 1163.698,265.02 1162.725,288.039ZM931.972,76.381L931.972,156.569L1019.796,156.569C1029.434,156.636 1038.765,153.138 1045.984,146.75C1054.187,138.808 1058.396,127.581 1057.438,116.203C1058.133,105.435 1054.498,94.822 1047.346,86.743C1041.074,80.034 1032.256,76.27 1023.073,76.381L931.972,76.381ZM1071.624,270.037C1071.929,258.946 1068.251,248.104 1061.259,239.489C1054.986,231.438 1045.28,226.787 1035.075,226.943L931.972,226.943L931.972,311.498L1031.254,311.498C1042.054,311.83 1052.525,307.68 1060.166,300.041C1067.947,292.045 1072.094,281.184 1071.624,270.037Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1597.051,387.325L1597.051,0.007L1771.619,0.007C1789.1,-0.152 1806.378,3.772 1822.076,11.464C1837.206,18.861 1850.809,29.041 1862.172,41.471C1873.413,53.79 1882.372,68.013 1888.63,83.473C1894.872,98.52 1898.115,114.644 1898.177,130.935C1898.277,154.019 1892.454,176.748 1881.267,196.94C1870.482,216.451 1854.406,232.526 1834.896,243.311L1920,387.327L1819.078,387.327L1744.888,262.402L1686.519,262.402L1686.519,387.325L1597.051,387.325ZM1686.519,184.393L1768.347,184.393C1779.337,184.161 1789.541,178.547 1795.622,169.389C1803.626,158.212 1807.659,144.669 1807.076,130.933C1807.801,116.996 1803.107,103.304 1793.982,92.744C1787.018,84.153 1776.669,78.978 1765.618,78.562L1686.519,78.562L1686.519,184.393Z" style="fill:white;fill-rule:nonzero;"/>
+    <rect x="1231.322" y="308.77" width="272.214" height="78.555" style="fill:white;"/>
+    <rect x="1231.322" y="0.007" width="272.214" height="78.555" style="fill:white;"/>
+    <rect x="1231.16" y="154.388" width="272.214" height="78.555" style="fill:white;"/>
+    <path d="M89.465,78.561L272.291,78.561L272.291,0.007L0,0.007L0,387.323L272.213,387.323L272.213,308.77L89.465,308.77L89.465,232.943L242.171,232.943L242.171,154.388L89.465,154.388L89.465,78.561Z" style="fill:white;fill-rule:nonzero;"/>
+    <rect x="0" y="511.001" width="355.291" height="355.291" style="fill:rgb(255,196,0);"/>
+    <path d="M430.887,866.291L430.887,511.291L456.387,511.291L456.387,843.291L668.387,843.291L668.387,866.291L430.887,866.291Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M832.887,511.291L854.887,511.291L1004.887,866.291L977.887,866.291L928.387,749.291L758.887,749.291L709.387,866.291L681.887,866.291L832.887,511.291ZM921.387,728.291L843.887,542.291L764.887,728.291L921.387,728.291Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1320.387,774.291C1320.387,791.624 1316.137,807.207 1307.637,821.041C1299.137,834.874 1287.637,845.874 1273.137,854.041C1258.637,862.207 1242.554,866.291 1224.887,866.291L1058.887,866.291L1058.887,511.291L1224.387,511.291C1241.054,511.291 1255.47,515.707 1267.637,524.541C1279.804,533.374 1289.137,544.707 1295.637,558.541C1302.137,572.374 1305.387,586.791 1305.387,601.791C1305.387,619.457 1300.887,635.874 1291.887,651.041C1282.887,666.207 1270.387,677.291 1254.387,684.291C1274.72,690.291 1290.804,701.541 1302.637,718.041C1314.47,734.541 1320.387,753.291 1320.387,774.291ZM1294.887,770.791C1294.887,758.124 1291.97,746.291 1286.137,735.291C1280.304,724.291 1272.387,715.291 1262.387,708.291C1252.387,701.291 1241.054,697.791 1228.387,697.791L1084.387,697.791L1084.387,843.291L1224.887,843.291C1237.887,843.291 1249.72,839.874 1260.387,833.041C1271.054,826.207 1279.47,817.207 1285.637,806.041C1291.804,794.874 1294.887,783.124 1294.887,770.791ZM1084.387,534.291L1084.387,676.291L1214.387,676.291C1227.387,676.291 1238.804,672.874 1248.637,666.041C1258.47,659.207 1266.22,650.374 1271.887,639.541C1277.554,628.707 1280.387,617.291 1280.387,605.291C1280.387,592.291 1277.72,580.457 1272.387,569.791C1267.054,559.124 1259.637,550.541 1250.137,544.041C1240.637,537.541 1229.72,534.291 1217.387,534.291L1084.387,534.291Z" style="fill:white;fill-rule:nonzero;"/>
+    <path d="M1596.387,570.291C1590.72,563.957 1584.387,558.374 1577.387,553.541C1570.387,548.707 1562.887,544.707 1554.887,541.541C1546.887,538.374 1538.22,535.957 1528.887,534.291C1519.554,532.624 1509.554,531.791 1498.887,531.791C1464.22,531.791 1438.97,538.374 1423.137,551.541C1407.304,564.707 1399.387,582.457 1399.387,604.791C1399.387,619.791 1402.97,631.707 1410.137,640.541C1417.304,649.374 1428.554,656.457 1443.887,661.791C1459.22,667.124 1479.054,672.291 1503.387,677.291C1529.054,682.624 1551.22,688.874 1569.887,696.041C1588.554,703.207 1602.97,712.957 1613.137,725.291C1623.304,737.624 1628.387,754.291 1628.387,775.291C1628.387,790.957 1625.387,804.707 1619.387,816.541C1613.387,828.374 1604.72,838.124 1593.387,845.791C1582.054,853.457 1568.637,859.291 1553.137,863.291C1537.637,867.291 1520.387,869.291 1501.387,869.291C1483.054,869.291 1465.554,867.291 1448.887,863.291C1432.22,859.291 1416.554,853.457 1401.887,845.791C1387.22,838.124 1373.554,828.291 1360.887,816.291L1374.387,795.791C1381.72,803.791 1389.97,810.874 1399.137,817.041C1408.304,823.207 1418.304,828.457 1429.137,832.791C1439.97,837.124 1451.554,840.541 1463.887,843.041C1476.22,845.541 1489.054,846.791 1502.387,846.791C1533.387,846.791 1557.637,841.041 1575.137,829.541C1592.637,818.041 1601.387,800.957 1601.387,778.291C1601.387,762.624 1597.387,749.957 1589.387,740.291C1581.387,730.624 1569.054,722.707 1552.387,716.541C1535.72,710.374 1514.887,704.624 1489.887,699.291C1464.887,693.957 1443.637,687.957 1426.137,681.291C1408.637,674.624 1395.47,665.624 1386.637,654.291C1377.804,642.957 1373.387,627.624 1373.387,608.291C1373.387,586.957 1378.637,568.874 1389.137,554.041C1399.637,539.207 1414.387,527.957 1433.387,520.291C1452.387,512.624 1474.22,508.791 1498.887,508.791C1514.22,508.791 1528.47,510.291 1541.637,513.291C1554.804,516.291 1566.97,520.874 1578.137,527.041C1589.304,533.207 1599.72,540.957 1609.387,550.291L1596.387,570.291Z" style="fill:white;fill-rule:nonzero;"/>
+</svg><p>Trial data, not validated. Internal only.</p></footer>
+<script>window.GGAF={"D":{"Germany":{"ch_grid":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Total line length","vals":[36800.0,37300.0,37500.0,37200.0,36300.0,37700.0,38400.0,38400.0,39463.0,40655.0,42104.0,43337.0,45221.0,47077.0,48642.0,49922.0,51981.0,52939.0,54896.0,57246.0,58406.0,60002.0,60742.0,61563.0,62254.0,62962.0,63922.0,64234.0]}],"unit":"","note":"≥220 kV TSO, onshore + offshore","proj":2025,"src":"tab 1"},"ch_stor":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Total storage capacity","vals":[11.2,11.7,12.3,13.4,15.0,19.1,23.3,27.4,36.8,46.1,55.4,64.7,74.0,83.3,92.6,101.9,111.2,120.5,129.8,139.1,140.9,142.7,144.4,146.2,148.0,149.8,151.5,153.3]}],"unit":"","note":"Batteries (large + small/home) + pumped hydro","proj":2025,"src":"tab 2"},"ch_res":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"RES-E share","vals":[35.3,40.2,44.4,40.2,44.4,54.7,58.6,59.1,62.8,66.4,70.1,73.8,77.4,81.1,84.8,86.7,88.7,90.6,92.6,94.5,94.8,95.1,95.4,95.7,95.9,96.2,96.5,96.8]}],"unit":"","note":"Renewables % of generation","proj":2025,"src":"tab 3"},"ch_acc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Access (total)","vals":[100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0]}],"unit":"","note":"% of population with electricity","proj":2024,"src":"tab 4"},"ch_dem":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Annual demand","vals":[583.54,567.42,547.72,560.25,539.62,515.94,522.26,519.96,549.7,581.1,614.3,649.5,686.6,725.8,767.3,811.2,857.6,906.6,958.4,1013.2,1031.3,1049.6,1068.3,1087.4,1106.7,1126.4,1146.5,1166.9]}],"unit":"TWh","note":"History: Ember (tab 5). Projection: Ember level grown at the plan's rate, NEP 2037/2045 (2025), scenario B (tab 7).","proj":2025,"src":"tabs 5, 7"},"ch_cons":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Consumption per capita","vals":[7000.0,6791.0,6549.0,6694.0,6417.0,6102.0,6177.0,6184.0,6554.0,6947.0,7362.0,7803.0,8269.0,8765.0,9289.0,9846.0,10435.0,11062.0,11730.0,12438.0,12699.0,12966.0,13238.0,13514.0,13796.0,14088.0,14389.0,14696.0]}],"unit":"kWh/capita","note":"Demand ÷ population (World Bank). Projection uses NEP 2037/2045 (2025), scenario B (tab 7).","proj":2025,"src":"tab 7"},"g_queue":{"xs":[2025],"series":[{"name":"of which other technologies (incl. RES, hybrids, loads)","vals":[59.0]}],"unit":"GW","note":"Row used: \"of which other technologies (incl. RES, hybrids, loads)\". 270 − 211. Upper bound for RES at TSO level; composition not published. Equal to 22% of installed generation capacity (2025, tab 9).","proj":null,"src":"tabs 8, 9"},"g_queue_rel":{"xs":[2025],"series":[{"name":"Queue ÷ installed capacity","vals":[21.98211624441133]}],"unit":"% of installed generation capacity","note":"Generation in queue (tab 8, \"of which other technologies (incl. RES, hybrids, loads)\", 2025) ÷ total installed generation capacity (Ember, tab 9, latest year 2025).","proj":null,"src":"tabs 8, 9","dp":0},"g_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Grid ÷ renewables","vals":[0.2792060491493384,0.3583442838370565,0.5074901445466491,0.5298185941043084,0.4062638172439204,0.32514992503748125,0.6412646624718403]}],"unit":"ratio","note":"Transmission investment (tab 16, EUR million) ÷ renewable power investment (tab 19, \"Renewable power investment – all technologies\", EUR million). ","proj":null,"src":"tabs 16, 19","dp":2},"g_plans":{"xs":[2025],"series":[{"name":"NEP 2019 (2030)","vals":[84.48448448448448]}],"unit":"% of actual","note":"Renewable capacity assumed in each grid plan edition (tab 20) ÷ installed renewable capacity (Ember, tab 21), for years up to the latest actual. 100% = plan matched outturn; plan RES definitions may differ from Ember's.","proj":null,"src":"tabs 20, 21","dp":0},"g_path":{"xs":[2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Latest grid plan","vals":[null,null,null,null,null,null,null,null,null,null,623.8,624.8,625.8,626.7,627.7,628.7]},{"name":"Policy pathway","vals":[360.0,389.2,418.4,447.6,476.8,506.0,527.8,549.6,571.4,593.2,615.0,null,null,null,null,null]}],"unit":"GW","note":"Basis: Wind + solar. Plan: NEP 2027 (2040/2045) (tab 26). Policy: official – EEG 2023 + WindSeeG (in force); targets kept in the EEG 2027 cabinet draft (BT-Drs. 21/7867, 1st reading 24 Sep 2026) (tab 27).","proj":2030,"src":"tabs 26, 27","dp":0},"f_curt":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Curtailment","vals":[0.8544994464652856,1.0801533077820362,1.084333098094566,1.0051831375259157,1.4237078849885343,2.0680876258140914,1.8929435483870969,1.8739260739260741]}],"unit":"% of generation","note":"Curtailed GWh (tab 10) ÷ total generation (Ember, tab 11). All grid operators (TSO + DSO), RE curtailed for grid constraints","proj":null,"src":"tabs 10, 11","dp":2},"f_src":{"xs":[2024],"series":[{"name":"Flexibility ÷ wind + solar","vals":[29.96949359365467]}],"unit":"% of wind + solar capacity","note":"Pumped hydro + batteries + import interconnection capacity (tab 22 \"Total\") ÷ installed wind and solar (tab 23). Only years where tab 22 has a total are shown.","proj":null,"src":"tabs 22, 23","dp":0},"f_plan":{"xs":[2040],"series":[{"name":"Planned flexibility ÷ wind + solar","vals":[38.31676819493428]}],"unit":"% of wind + solar capacity","note":"Planned flexibility (tab 28 \"Total\") ÷ wind + solar capacity in the latest grid plan (tab 26, standing in for \"Projected VRE\"). NEP 2027 (2040/2045) scenario framework DRAFT, scenario B; interconnection from Ember (TYNDP reference grid)","proj":2040,"src":"tabs 26, 28","dp":0},"d_head":{"xs":[2021,2022,2023,2024,2025],"series":[{"name":"Transformer ÷ peak","vals":[2.163252217028257,2.255182318475871,2.5210974764564393,2.441670539804794,2.4676406425596613]}],"unit":"× peak demand","note":"\"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18) ÷ actual peak demand (MW, tab 24). Tier 1, basis B: 4 TSOs, 380/220 kV→110 kV (HöS/HS) transformation; § 23c EnWG structural data, stock at 31.12.","proj":null,"src":"tabs 18, 24","dp":2},"d_path":{"xs":[2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Latest grid plan","vals":[null,null,null,null,null,null,null,null,null,null,1134.6,1148.3,1162.0,1175.8,1189.5,1203.2]},{"name":"Policy pathway","vals":[750.0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}],"unit":"TWh","note":"Plan: NEP 2027 (2040/2045), gross electricity consumption (TWh) (tab 31). Policy: Annual electricity demand (TWh) – gross, official (tab 27). Definitions may differ.","proj":2030,"src":"tabs 27, 31","dp":0},"r_inc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Incidents (count)","vals":[166.0,191.0,209.0,270.0,299.0,267.0,255.0,373.0]}],"unit":"count per year","note":"Row: \"Incidents (count)\" (tab 13). 4 TSOs (50Hertz, Amprion, TenneT DE, TransnetBW) – ICS incidents, all scales. Definitions differ by country; compare trends, not levels.","proj":null,"src":"tab 13","dp":0},"c_cost":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Cost per MWh","vals":[2.53,2.25,2.62,4.08,7.87,5.98,5.66,5.91]}],"unit":"EUR/MWh of demand","note":"Congestion cost ÷ Ember demand (tab 15), nominal local currency. All TSOs and DSOs: Netz- und Systemsicherheitsmaßnahmen (redispatch + RE curtailment compensation + countertrading + grid reserve)","proj":null,"src":"tab 15","dp":2},"c_ratio":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Congestion ÷ grid investment","vals":[49.98645903859173,46.901356802346896,37.08959088555153,48.91290391611384,77.05423544349719,35.57348703170029,17.892186553603874]}],"unit":"% of grid investment","note":"Congestion cost (tab 15, \"Congestion management cost\", EUR million) ÷ grid investment (tab 16, EUR million), same currency.","proj":null,"src":"tabs 15, 16","dp":0},"c_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Grid investment per MWh","vals":[5.062206532542756,4.805963836311727,7.051047980720075,8.340919232485497,10.216448611986213,16.813970616738377,31.61260674759698]}],"unit":"EUR/MWh of demand","note":"Grid investment (tab 16) ÷ Ember demand (tab 5), nominal. ","proj":null,"src":"tabs 5, 16","dp":1},"c_proj":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037],"series":[{"name":"Grid investment per MWh","vals":[5.062206532542756,4.805963836311727,7.051047980720075,8.340919232485497,10.216448611986213,16.813970616738377,31.61260674759698,44.03846153846153,41.659086774604326,39.40801927379108,37.27820283249227,35.257890685142414,33.35275269443635,31.551391567925045,29.844910725922066,28.22978303747534,26.70242537313433,25.259210236046766,23.893989983305506,22.601658112909593]}],"unit":"EUR/MWh of demand","note":"History as in \"grid investment relative to demand\". Projection: NEP 2025 (2037/2045) annual transmission investment (tab 33) ÷ projected demand (Ember level × plan growth, tab 7). Plan totals spread evenly over the plan period where no annual split is published.","proj":2024,"src":"tabs 7, 16, 33","dp":1},"u_proxy":{"xs":[2021,2022,2023,2024,2025],"series":[{"name":"Average load ÷ transformer capacity","vals":[36.464450652830834,34.71596032461677,31.746981457524797,32.335889487137656,31.80240034290613]}],"unit":"% of transformer capacity","note":"Average hourly load (MW, tab 17) ÷ \"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18). Higher = more intensive use of existing assets. MW and MVA are treated as equivalent (power factor of 1).","proj":null,"src":"tabs 17, 18","dp":0},"u_peak":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,0.985,0.981,1.024,1.038,1.023,1.03,1.032]}],"unit":"index (2018=1)","note":"Peak demand growth ÷ annual demand growth, paired source (tab 24). Above 1 = peak growing faster than energy. Actual: ENTSO-E hourly total load (Ember entsoe_load_hourly asset): peak = max hour, demand = sum of hours","proj":null,"src":"tab 24","dp":3},"u_proj":{"xs":[2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,1.02,1.038,1.047,1.055,1.062,1.073,1.083]}],"unit":"index (2028=1)","note":"Projected peak growth ÷ projected annual demand growth (tab 24). Projected: ENTSO-E ERAA 2025 (central reference scenario – to confirm): max hourly load and annual demand","proj":2028,"src":"tab 24","dp":3}},"Poland":{"ch_grid":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036],"series":[{"name":"Total line length","vals":[14695.0,14822.0,15219.0,15693.0,15965.0,16247.0,16707.0,16634.0,17199.0,17757.0,18316.0,18875.0,19433.0,19992.0,20550.0,21109.0,21668.0,22226.0,22785.0]}],"unit":"","note":"220-750 kV, PSE (TSO), overhead","proj":2025,"src":"tab 1"},"ch_stor":{"xs":[2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"Total storage capacity","vals":[2.2,4.1,6.1,8.0,9.9,11.8,13.8,15.7,17.6,19.5,21.4,22.9,24.3,25.8,27.2]}],"unit":"","note":"Utility + home batteries + pumped hydro","proj":2026,"src":"tab 2"},"ch_res":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"RES-E share","vals":[12.8,15.6,18.0,17.1,21.1,27.7,31.1,31.3,34.4,37.6,40.8,43.9,47.1,50.3,53.4,56.6,59.8,62.9,66.1,65.9,65.8,65.7,65.5]}],"unit":"","note":"Renewables % of generation","proj":2025,"src":"tab 3"},"ch_acc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Access (total)","vals":[100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0]}],"unit":"","note":"% of population with electricity","proj":2024,"src":"tab 4"},"ch_dem":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"Annual demand","vals":[175.12,173.84,170.42,179.68,176.92,169.26,174.09,173.53,185.5,188.7,195.2,201.7,209.2,216.8,222.2,227.6,233.0,238.3,248.6,258.8,266.4,272.9,284.9]}],"unit":"TWh","note":"History: Ember (tab 5). Projection: Ember level grown at the plan's rate, PSE PRSP 2027-2036 – network planning (SWS) (tab 7).","proj":2025,"src":"tabs 5, 7"},"ch_cons":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"Consumption per capita","vals":[4579.0,4548.0,4465.0,4723.0,4609.0,4367.0,4517.0,4550.0,4881.0,4985.0,5177.0,5373.0,5600.0,5832.0,6010.0,6191.0,6375.0,6562.0,6886.0,7216.0,7474.0,7706.0,8100.0]}],"unit":"kWh/capita","note":"Demand ÷ population (World Bank). Projection uses PSE PRSP 2027-2036 – network planning (SWS) (tab 7).","proj":2025,"src":"tab 7"},"g_queue":{"xs":[2026],"series":[{"name":"RES in queue – total excl. storage (all stages)","vals":[72.1]}],"unit":"GW","note":"Row used: \"RES in queue – total excl. storage (all stages)\". PSE, PRSP 2027–2036 draft after consultation, Tab. 3.4 (status 31.03.2026). Onshore wind 9.3 + PV 45.6 + offshore 17.2 GW, summed over: agreements signed, conditions issued, planned at 110 kV and MV. Storage (83.0 GW + 26.4 GW at SD) excluded. Transmission-sta Equal to 102% of installed generation capacity (2025, tab 9).","proj":null,"src":"tabs 8, 9"},"g_queue_rel":{"xs":[2026],"series":[{"name":"Queue ÷ installed capacity","vals":[101.98019801980196]}],"unit":"% of installed generation capacity","note":"Generation in queue (tab 8, \"RES in queue – total excl. storage (all stages)\", 2026) ÷ total installed generation capacity (Ember, tab 9, latest year 2025).","proj":null,"src":"tabs 8, 9","dp":0},"g_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Grid ÷ renewables","vals":[1.299353912419239,0.4530385241454151,0.09782244556113902,0.05640086081544815,0.044181109487018866,0.06956783390378757,0.08118357487922705,0.15739212007504688]}],"unit":"ratio","note":"Transmission investment (tab 16, PLN million) ÷ renewable power investment (tab 19, \"Renewable power investment – all technologies\", PLN million). Renewable investment is an estimate. ","proj":null,"src":"tabs 16, 19","dp":2},"g_path":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"Latest grid plan","vals":[null,null,null,null,null,null,null,null,null,null,null,87.7,92.4,97.1,101.8,106.4]},{"name":"Policy pathway","vals":[37.0,41.0,45.0,49.0,53.1,57.1,61.2,65.4,69.6,73.7,77.9,80.8,83.6,86.5,89.4,92.3]}],"unit":"GW","note":"Basis: Total renewables. Plan: PRSP 2027–2036 (PSE transmission development plan) (tab 26). Policy: official – KPEiK (updated NECP) adopted 8 Jun 2026, WAM scenario (accelerated transformation, Annex 1) (tab 27).","proj":2025,"src":"tabs 26, 27","dp":0},"f_curt":{"xs":[2023,2024,2025],"series":[{"name":"Curtailment","vals":[0.042416918429003025,0.4353864032539221,0.8111239860950175]}],"unit":"% of generation","note":"Curtailed GWh (tab 10) ÷ total generation (Ember, tab 11). All operators (PSE + DSOs), wind + PV, all causes","proj":null,"src":"tabs 10, 11","dp":2},"f_src":{"xs":[2024],"series":[{"name":"Flexibility ÷ wind + solar","vals":[15.078369905956112]}],"unit":"% of wind + solar capacity","note":"Pumped hydro + batteries + import interconnection capacity (tab 22 \"Total\") ÷ installed wind and solar (tab 23). Only years where tab 22 has a total are shown.","proj":null,"src":"tabs 22, 23","dp":0},"f_plan":{"xs":[2036,2037,2038,2039,2040],"series":[{"name":"Planned flexibility ÷ wind + solar","vals":[31.254396248534583,null,null,null,31.13243761996161]}],"unit":"% of wind + solar capacity","note":"Planned flexibility (tab 28 \"Total\") ÷ wind + solar capacity in the latest grid plan (tab 26, standing in for \"Projected VRE\"). PRSP 2027–2036 (PSE) DRAFT (Apr 2026); interconnection from Ember (TYNDP reference grid)","proj":2036,"src":"tabs 26, 28","dp":0},"d_head":{"xs":[2019,2020,2021,2022,2023,2024],"series":[{"name":"Transformer ÷ peak","vals":[2.275405570860116,2.3518769787426503,2.3035616438356166,2.240233729006652,null,2.2316280384397964]}],"unit":"× peak demand","note":"\"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18) ÷ actual peak demand (MW, tab 24). Tier 1: PSE + 5 largest DSOs, transformers with both windings ≥110 kV (400/220/110 kV)","proj":null,"src":"tabs 18, 24","dp":2},"d_path":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"Latest grid plan","vals":[null,172.0,175.0,181.0,187.0,194.0,201.0,206.0,211.0,216.0,221.0,230.0,240.0,247.0,253.0,264.0]},{"name":"Policy pathway","vals":[178.1,181.8,185.5,189.1,192.8,196.5,202.0,207.4,212.9,218.3,223.8,233.1,242.5,251.8,261.2,270.5]}],"unit":"TWh","note":"Plan: PRSP 2027–2036 (PSE), net national demand (TWh) (tab 31). Policy: Annual electricity demand (TWh) – gross final electricity consumption, official (tab 27). Definitions may differ.","proj":2025,"src":"tabs 27, 31","dp":0},"r_ens":{"xs":[2018,2019,2020,2021,2022,2023],"series":[{"name":"ENS per TWh","vals":[1.51,3.46,0.73,6.77,0.72,0.78]}],"unit":"MWh per TWh of demand","note":"Energy not supplied ÷ Ember demand (tab 13). PSE transmission system (220/400 kV), all outages (planned + emergency)","proj":null,"src":"tab 13","dp":1},"r_inc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Incidents (count)","vals":[100.0,101.0,91.0,115.0,157.0,88.0,87.0,93.0]}],"unit":"count per year","note":"Row: \"Incidents (count)\" (tab 13). PSE – ICS incidents, all scales (same basis as Germany). Definitions differ by country; compare trends, not levels.","proj":null,"src":"tab 13","dp":0},"c_cost":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Cost per MWh","vals":[3.16,2.69,1.95,5.09,9.65,7.81,7.35,6.03]}],"unit":"PLN/MWh of demand","note":"Congestion cost ÷ Ember demand (tab 15), nominal local currency. PSE balancing market: koszty usuwania ograniczeń (KO) – redispatch, countertrading and must-run units","proj":null,"src":"tab 15","dp":2},"c_ratio":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Congestion ÷ grid investment","vals":[30.618784530386744,27.9777232169591,29.9477289113194,94.28689285345982,134.43087829854272,71.43706747404845,63.45829614202123,41.598124528151956]}],"unit":"% of grid investment","note":"Congestion cost (tab 15, \"Constraint removal cost (KO)\", PLN million) ÷ grid investment (tab 16, PLN million), same currency.","proj":null,"src":"tabs 15, 16","dp":0},"c_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Grid investment per MWh","vals":[10.33576975788031,9.605959502991256,6.510972890505809,5.396816562778272,7.17555957494913,10.927567056599315,11.583663622264345,14.502967786549876]}],"unit":"PLN/MWh of demand","note":"Grid investment (tab 16) ÷ Ember demand (tab 5), nominal. ","proj":null,"src":"tabs 5, 16","dp":1},"c_proj":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036],"series":[{"name":"Grid investment per MWh","vals":[10.33576975788031,9.605959502991256,6.510972890505809,5.396816562778272,7.17555957494913,10.927567056599315,11.583663622264345,14.502967786549876,null,23.847376788553262,33.81147540983607,32.226078334159645,48.75717017208413,40.59040590405904,31.5031503150315,34.27065026362039,34.33476394849785,21.401594628619385,14.481094127111826]}],"unit":"PLN/MWh of demand","note":"History as in \"grid investment relative to demand\". Projection: PRSP 2027–2036 (PSE transmission development plan) annual transmission investment (tab 33) ÷ projected demand (Ember level × plan growth, tab 7). Poland plan values are in 2025 constant prices. Plan totals spread evenly over the plan period where no annual split is published.","proj":2025,"src":"tabs 7, 16, 33","dp":1},"u_proxy":{"xs":[2019,2020,2021,2022,2023,2024],"series":[{"name":"Average load ÷ transformer capacity","vals":[33.36976626870691,31.091346153846157,32.52616555661275,33.130464738594796,null,31.37705021847888]}],"unit":"% of transformer capacity","note":"Average hourly load (MW, tab 17) ÷ \"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18). Higher = more intensive use of existing assets. MW and MVA are treated as equivalent (power factor of 1).","proj":null,"src":"tabs 17, 18","dp":0},"u_peak":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,1.007,1.044,1.02,1.027,1.062,1.128,1.071]}],"unit":"index (2018=1)","note":"Peak demand growth ÷ annual demand growth, paired source (tab 24). Above 1 = peak growing faster than energy. Actual: ENTSO-E hourly total load (Ember entsoe_load_hourly asset): peak = max hour, demand = sum of hours","proj":null,"src":"tab 24","dp":3},"u_proj":{"xs":[2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,1.0,1.001,1.001,1.001,1.002,1.003,1.004]}],"unit":"index (2028=1)","note":"Projected peak growth ÷ projected annual demand growth (tab 24). Projected: ENTSO-E ERAA 2025 (central reference scenario – to confirm): max hourly load and annual demand","proj":2028,"src":"tab 24","dp":3}},"South Korea":{"ch_grid":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Total line length","vals":[34155.0,34440.0,34665.0,35184.0,35451.0,35596.0,35857.0,36184.0,38397.0,40611.0,42824.0,45038.0,47251.0,48992.0,50734.0,52476.0,54217.0,55958.0,57700.0,59442.0,61183.0]}],"unit":"","note":"KEPCO transmission: 765/345/154 kV + 66 kV + HVDC","proj":2025,"src":"tab 1"},"ch_stor":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Total storage capacity","vals":[6.5,6.8,7.0,7.2,7.2,7.4,8.4,8.7,9.6,10.6,11.5,12.4,13.4,16.7,19.9,23.2,26.5,29.8,31.9,34.0,36.1]}],"unit":"","note":"Batteries + pumped hydro","proj":2025,"src":"tab 2"},"ch_res":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"RES-E share","vals":[4.7,5.6,7.0,7.9,8.9,9.6,9.7,10.4,11.8,13.3,14.7,16.2,17.6,19.1,20.5,22.0,23.4,24.9,26.3,27.8,29.2]}],"unit":"","note":"Renewables % of generation","proj":2025,"src":"tab 3"},"ch_acc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Access (total)","vals":[100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0]}],"unit":"","note":"% of population with electricity","proj":2024,"src":"tab 4"},"ch_dem":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Annual demand","vals":[592.91,586.8,577.11,607.76,622.59,617.49,625.38,624.66,631.6,640.1,646.2,650.6,659.2,666.1,675.6,679.2,682.5,691.5,691.5,694.6,697.6]}],"unit":"TWh","note":"History: Ember (tab 5). Projection: Ember level grown at the plan's rate, 11th Basic Plan, target demand (tab 7).","proj":2025,"src":"tabs 5, 7"},"ch_cons":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Consumption per capita","vals":[11481.0,11335.0,11129.0,11722.0,12023.0,11932.0,12092.0,12090.0,12249.0,12443.0,12593.0,12712.0,12918.0,13095.0,13328.0,13451.0,13575.0,13818.0,13888.0,14029.0,14176.0]}],"unit":"kWh/capita","note":"Demand ÷ population (World Bank). Projection uses 11th Basic Plan, target demand (tab 7).","proj":2025,"src":"tab 7"},"g_queue":{"xs":[2026],"series":[{"name":"RES applied but not yet connected","vals":[8.683]}],"unit":"GW","note":"Row used: \"RES applied but not yet connected\". Applied 38,065 MW, connected 29,382 MW, remaining 8,683 MW (of which 3,546 MW waiting for grid capacity) (Asia Economy, 31 Oct 2026). 205 'grid-management' substations designated May 2024 (164 in Honam): new connections only after 2032. KEPCO aims to clear 3,4 Equal to 5% of installed generation capacity (2025, tab 9).","proj":null,"src":"tabs 8, 9"},"g_queue_rel":{"xs":[2026],"series":[{"name":"Queue ÷ installed capacity","vals":[5.464443045940843]}],"unit":"% of installed generation capacity","note":"Generation in queue (tab 8, \"RES applied but not yet connected\", 2026) ÷ total installed generation capacity (Ember, tab 9, latest year 2025).","proj":null,"src":"tabs 8, 9","dp":0},"g_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Grid ÷ renewables","vals":[1.7075280512644233,0.8509865890882854,1.0049985583299694,1.7383132928259521,1.4475771430620552,1.8503525558939384,2.1429527513854234,1.9227149341968148]}],"unit":"ratio","note":"NB grid investment is KEPCO (total capex incl. distribution and non-grid spending), not transmission only. Transmission investment (tab 16, KRW million) ÷ renewable power investment (tab 19, \"Renewable power investment – all technologies\", KRW million). Renewable investment is an estimate. ","proj":null,"src":"tabs 16, 19","dp":2},"g_plans":{"xs":[2020,2021,2022,2023,2024,2025],"series":[{"name":"11th Basic Plan (2024–2038)","vals":[null,null,null,null,102.98507462686568,104.55764075067025]},{"name":"10th Basic Plan (2022–2036)","vals":[null,null,103.7174721189591,103.64238410596028,104.77611940298507,103.48525469168901]},{"name":"9th Basic Plan (2020–2034)","vals":[88.07339449541284,98.3402489626556,104.46096654275094,109.60264900662253,114.6268656716418,117.69436997319036]}],"unit":"% of actual","note":"Renewable capacity assumed in each grid plan edition (tab 20) ÷ installed renewable capacity (Ember, tab 21), for years up to the latest actual. 100% = plan matched outturn; plan RES definitions may differ from Ember's.","proj":null,"src":"tabs 20, 21","dp":0},"g_path":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Latest grid plan","vals":[39.0,44.1,50.4,57.6,68.0,78.0,85.1,90.6,96.2,101.8,107.8,112.5,117.2,121.9]},{"name":"Policy pathway","vals":[null,null,null,null,null,100.0,null,null,null,null,null,null,null,null]}],"unit":"GW","note":"Basis: Total renewables. Plan: 11th Basic Plan (2024–2038) (tab 26). Policy: official – 1st Basic Plan for Renewable Energy (Energy Committee, 19 May 2026); 100 GW also in the K-GX strategy (7 Oct 2026) (tab 27).","proj":2025,"src":"tabs 26, 27","dp":0},"f_curt":{"xs":[2020,2021,2022,2023,2024,2025],"series":[{"name":"Curtailment","vals":[0.0033789637844394388,0.002517275419545904,0.0056215868936717,0.005797570850202429,0.0038855132715062365,0.016680006403073475]}],"unit":"% of generation","note":"Curtailed GWh (tab 10) ÷ total generation (Ember, tab 11). National RE: mainland + Jeju, all RE sources","proj":null,"src":"tabs 10, 11","dp":2},"f_src":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Flexibility ÷ wind + solar","vals":[72.00000000000001,55.60975609756097,42.865853658536594,36.47959183673469,32.08888888888889,28.75486381322957,29.169550173010382,26.432926829268293]}],"unit":"% of wind + solar capacity","note":"Pumped hydro + batteries + import interconnection capacity (tab 22 \"Total\") ÷ installed wind and solar (tab 23). Only years where tab 22 has a total are shown.","proj":null,"src":"tabs 22, 23","dp":0},"f_plan":{"xs":[2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Planned flexibility ÷ wind + solar","vals":[12.702702702702704,15.654320987654321,18.42956120092379,20.867678958785245,23.026584867075663,24.85549132947977,26.11059907834101,27.270318021201412,28.329092451229855]}],"unit":"% of wind + solar capacity","note":"Planned flexibility (tab 28 \"Total\") ÷ wind + solar capacity in the latest grid plan (tab 26, standing in for \"Projected VRE\"). 11th Basic Plan (2024–2038)","proj":2030,"src":"tabs 26, 28","dp":0},"d_head":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Transformer ÷ peak","vals":[1.9110058608533922,1.9566623114910202,2.061712181926345,2.064712917347846,2.000656022177782,2.0571489611707525,2.0220357308345775,2.1351523173286364]}],"unit":"× peak demand","note":"\"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18) ÷ actual peak demand (MW, tab 24). Tier 1: KEPCO 765/345 kV substation transformers (765/345, 345/154 kV)","proj":null,"src":"tabs 18, 24","dp":2},"d_plans":{"xs":[2021,2022,2023,2024,2025],"series":[{"name":"11th Basic Plan (2024–2038)","vals":[null,null,null,100.0,101.36602372527159]},{"name":"10th Basic Plan (2022–2036)","vals":[null,null,100.0,100.20142202402522,101.24577723299181]},{"name":"9th Basic Plan (2020–2034)","vals":[100.0,98.18358873391696,99.81186185034053,99.32210486012917,99.69964595463766]}],"unit":"% of actual growth","note":"Demand growth assumed by each plan edition (tab 25) ÷ actual demand growth (Ember, tab 5), both indexed to the plan's first year. Growth is compared, not levels, because plan demand definitions differ from Ember's. Above 100% = plan expected more growth than happened.","proj":null,"src":"tabs 5, 25","dp":0},"d_path":{"xs":[2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Latest grid plan","vals":[552.3,559.2,565.4,573.0,578.5,582.4,590.1,596.3,604.8,608.0,611.0,619.0,619.0,621.8,624.5]}],"unit":"TWh","note":"Plan: 11th Basic Plan (2024–2038), target demand, consumption (TWh) (tab 31). No policy pathway for demand in tab 27, so only the plan line is shown.","proj":2024,"src":"tabs 27, 31","dp":0},"r_inc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Forced outages (count)","vals":[99.0,83.0,156.0,90.0,122.0,96.0,102.0,117.0]}],"unit":"count per year","note":"Row: \"Forced outages (count)\" (tab 13). KEPCO transmission lines ≥154 kV – FALLBACK (no ENS published). Definitions differ by country; compare trends, not levels.","proj":null,"src":"tab 13","dp":0},"c_cost":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Cost per MWh","vals":[1920.5,2193.6,2708.1,3698.2,7454.3,6616.9,6344.6,6052.6]}],"unit":"KRW/MWh of demand","note":"Congestion cost ÷ Ember demand (tab 15), nominal local currency. KPX constraint payments (제약정산금): constrained-on + constrained-off; from Sep 2022 variable-cost compensation (MWP) + expected-profit (constrained-off) payments","proj":null,"src":"tab 15","dp":2},"c_ratio":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Congestion ÷ grid investment","vals":[18.0074212019159,20.300940306371974,23.914447208884567,33.27658921770997,76.64513303405234,53.50363777334042,47.1347561271144,41.648793420971174]}],"unit":"% of grid investment","note":"NB grid investment is KEPCO (total capex incl. distribution and non-grid spending), not transmission only. Congestion cost (tab 15, \"Constraint payments\", KRW billion) ÷ grid investment (tab 16, KRW million), same currency.","proj":null,"src":"tabs 15, 16","dp":0},"c_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Grid investment per MWh","vals":[10665.200452007894,10805.373210633948,11324.322919374123,11113.429643280242,9725.789042548065,12367.288539085654,13460.603153282804,14532.408029968303]}],"unit":"KRW/MWh of demand","note":"NB grid investment is KEPCO (total capex incl. distribution and non-grid spending), not transmission only. Grid investment (tab 16) ÷ Ember demand (tab 5), nominal. ","proj":null,"src":"tabs 5, 16","dp":1},"c_proj":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Grid investment per MWh","vals":[10665.200452007894,10805.373210633948,11324.322919374123,11113.429643280242,9725.789042548065,12367.288539085654,13460.603153282804,7843.765007203458,7758.074730842305,7655.053897828465,7582.79170535438,7531.509375960652,7433.252427184466,7356.252814892659,7252.812314979278,7214.369846878681,7179.487179487181,7086.044830079538,7086.044830079538,7054.419809962568,7024.08256880734]}],"unit":"KRW/MWh of demand","note":"History as in \"grid investment relative to demand\". Projection: 11th Basic Plan (2024–2038) annual transmission investment (tab 33) ÷ projected demand (Ember level × plan growth, tab 7). Plan totals spread evenly over the plan period where no annual split is published.","proj":2024,"src":"tabs 7, 16, 33","dp":1},"u_proxy":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Average load ÷ transformer capacity","vals":[38.29883548544074,37.90644770646355,35.768728222996515,36.868423849505795,37.58832240321557,36.60297019420501,36.25553801497174,34.80646263484161]}],"unit":"% of transformer capacity","note":"Average hourly load (MW, tab 17) ÷ \"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18). Higher = more intensive use of existing assets. MW and MVA are treated as equivalent (power factor of 1).","proj":null,"src":"tabs 17, 18","dp":0},"u_peak":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,0.987,0.995,0.972,0.981,0.976,1.005,0.994]}],"unit":"index (2018=1)","note":"Peak demand growth ÷ annual demand growth, paired source (tab 24). Above 1 = peak growing faster than energy. Actual: KEPCO statistics (한국전력통계): annual peak and electricity sales","proj":null,"src":"tab 24","dp":3},"u_proj":{"xs":[2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,1.005,1.013,1.019,1.026,1.032,1.047,1.062,1.073,1.09,1.103,1.117]}],"unit":"index (2027=1)","note":"Projected peak growth ÷ projected annual demand growth (tab 24). Projected: 11th Basic Plan on Electricity Supply and Demand 2024-2038 (MOTIE), target demand and summer peak, pdf p.33","proj":2027,"src":"tab 24","dp":3}},"Indonesia":{"ch_grid":{"xs":[2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034],"series":[{"name":"Total line length","vals":[62203.0,65771.0,69195.0,71923.0,73814.0,78590.0,83366.0,88141.0,92917.0,97693.0,102469.0,107245.0,112020.0,116796.0,121572.0]}],"unit":"","note":"70-500 kV, PLN + non-PLN (ESDM)","proj":2024,"src":"tab 1"},"ch_stor":{"xs":[2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034],"series":[{"name":"Total storage capacity","vals":[0.0,0.6,1.2,1.8,2.4,3.0,4.5,5.9,7.4,8.8,10.3]}],"unit":"","note":"Batteries + pumped hydro (PLN system)","proj":2024,"src":"tab 2"},"ch_res":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"RES-E share","vals":[17.1,16.3,18.1,18.2,19.6,18.6,18.1,18.6,19.1,19.5,20.0,20.5,21.0,23.0,25.1,27.1,29.1,31.1,33.2,35.2,37.2,39.3,41.3]}],"unit":"","note":"Renewables % of generation","proj":2024,"src":"tab 3"},"ch_acc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Access (total)","vals":[98.5,98.9,97.0,99.2,100.0,99.4,99.9,99.9,99.9,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0]}],"unit":"","note":"% of population with electricity","proj":2024,"src":"tab 4"},"ch_dem":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034],"series":[{"name":"Annual demand","vals":[285.29,297.12,293.37,310.33,334.34,351.49,372.5,393.3,415.2,438.4,459.8,482.1,506.4,536.0,569.6,598.7,621.5]}],"unit":"TWh","note":"History: Ember (tab 5). Projection: Ember level grown at the plan's rate, RUPTL PLN 2025-2034 (tab 7).","proj":2024,"src":"tabs 5, 7"},"ch_cons":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034],"series":[{"name":"Consumption per capita","vals":[1057.0,1090.0,1068.0,1121.0,1199.0,1250.0,1314.0,1376.0,1442.0,1512.0,1575.0,1640.0,1712.0,1800.0,1902.0,1987.0,2052.0]}],"unit":"kWh/capita","note":"Demand ÷ population (World Bank). Projection uses RUPTL PLN 2025-2034 (tab 7).","proj":2024,"src":"tab 7"},"g_queue":{"xs":[2026],"series":[{"name":"Proxy – rooftop PV waiting list","vals":[0.304]}],"unit":"GW","note":"Row used: \"Proxy – rooftop PV waiting list\". 304 MW allocated to the waiting list from the Jan 2026 485 MW rooftop quota tranche (Katadata, 14 Jul 2026). Rooftop quota 2024–28: 901 / 1,004 / 1,065 / 1,183 / 1,593 MW. Rooftop only – NOT a utility-scale queue. Equal to 0% of installed generation capacity (2024, tab 9).","proj":null,"src":"tabs 8, 9"},"g_queue_rel":{"xs":[2026],"series":[{"name":"Queue ÷ installed capacity","vals":[0.31243576567317577]}],"unit":"% of installed generation capacity","note":"Generation in queue (tab 8, \"Proxy – rooftop PV waiting list\", 2026) ÷ total installed generation capacity (Ember, tab 9, latest year 2024).","proj":null,"src":"tabs 8, 9","dp":0},"g_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Grid ÷ renewables","vals":[0.5,1.7,1.4,0.8,1.6,1.0,1.0,0.4]}],"unit":"ratio","note":"Uses the ratio row stored in tab 19 because the IDR renewable investment row is empty (ratio computed by the collector from the USD series at WDI exchange rates). Transmission investment (tab 16, IDR million) ÷ renewable power investment (tab 19, \"Renewable investment – EBTKE (all technologies)\", IDR million). ","proj":null,"src":"tabs 16, 19","dp":2},"g_plans":{"xs":[2021,2022,2023,2024],"series":[{"name":"RUPTL PLN 2021–2030","vals":[94.56521739130434,92.15686274509804,106.54205607476636,116.07142857142858]}],"unit":"% of actual","note":"Renewable capacity assumed in each grid plan edition (tab 20) ÷ installed renewable capacity (Ember, tab 21), for years up to the latest actual. 100% = plan matched outturn; plan RES definitions may differ from Ember's.","proj":null,"src":"tabs 20, 21","dp":0},"g_path":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"Latest grid plan","vals":[10.4,12.4,15.2,18.5,20.9,25.4,33.5,39.0,47.7,50.8,null,null,null,null,null,null]},{"name":"Policy pathway","vals":[null,null,null,null,null,38.4,46.2,54.0,61.7,69.5,77.3,85.1,92.9,100.6,108.4,116.2]}],"unit":"GW","note":"Basis: Total renewables. Plan: RUPTL PLN 2025–2034, ARED scenario (Accelerated Renewable Energy Development) (tab 26). Policy: official – RUKN 2025–2060 (national electricity plan, Kepmen ESDM 85.K/TL.01/MEM.L/2025, 5 Mar 2025; earlier 314.K/2024) (tab 27).","proj":2025,"src":"tabs 26, 27","dp":0},"f_src":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Flexibility ÷ wind + solar","vals":[114.99999999999999,76.66666666666667,76.66666666666667,57.49999999999999,46.0,28.749999999999996,20.909090909090907]}],"unit":"% of wind + solar capacity","note":"Pumped hydro + batteries + import interconnection capacity (tab 22 \"Total\") ÷ installed wind and solar (tab 23). Only years where tab 22 has a total are shown.","proj":null,"src":"tabs 22, 23","dp":0},"f_plan":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034],"series":[{"name":"Planned flexibility ÷ wind + solar","vals":[23.333333333333336,23.599999999999998,24.88888888888889,39.21875,40.51282051282051,34.67289719626168,36.4748201438849,40.88757396449705,41.25,42.642276422764226]}],"unit":"% of wind + solar capacity","note":"Planned flexibility (tab 28 \"Total\") ÷ wind + solar capacity in the latest grid plan (tab 26, standing in for \"Projected VRE\"). RUPTL PLN 2025–2034 (May 2025), ARED scenario","proj":2025,"src":"tabs 26, 28","dp":0},"d_head":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Transformer ÷ peak","vals":[3.3831312870776373,3.465431595114108,3.7453320019970047,3.643941871875146,3.8603621922920506,2.8601798153803917,2.7624820519514426]}],"unit":"× peak demand","note":"\"Transformer capacity Tiers 1+2 (EHV/HV and HV/MV)\" (MVA, tab 18) ÷ actual peak demand (MW, tab 24). Tiers 1+2 combined: PLN grid substation (gardu induk) transformers 500/275/150/70 kV","proj":null,"src":"tabs 18, 24","dp":2},"d_plans":{"xs":[2019,2020,2021,2022,2023,2024],"series":[{"name":"RUPTL PLN 2021–2030 (Sep 2021), moderate scenario","vals":[null,null,100.0,97.47612467164653,97.56883263987899,97.13473253800525]},{"name":"RUPTL PLN 2019–2028 (Feb 2019)","vals":[100.0,107.89233906058587,109.0300581934833,108.81749361825248,110.40857550451399,110.69256266264895]}],"unit":"% of actual growth","note":"Demand growth assumed by each plan edition (tab 25) ÷ actual demand growth (Ember, tab 5), both indexed to the plan's first year. Growth is compared, not levels, because plan demand definitions differ from Ember's. Above 100% = plan expected more growth than happened.","proj":null,"src":"tabs 5, 25","dp":0},"d_path":{"xs":[2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040],"series":[{"name":"Latest grid plan","vals":[null,323.0,340.0,360.1,377.7,396.1,416.0,440.3,467.9,491.8,510.6,null,null,null,null,null,null]},{"name":"Policy pathway","vals":[482.0,null,null,null,null,null,738.0,null,null,null,null,null,null,null,null,null,1140.0]}],"unit":"TWh","note":"Plan: RUPTL PLN 2025–2034 (May 2025), PLN electricity sales (TWh) (tab 31). Policy: Annual electricity demand (TWh) – national (incl. captive, off-grid), official (tab 27). Definitions may differ.","proj":2024,"src":"tabs 27, 31","dp":0},"r_inc":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Interruptions (count)","vals":[707.0,357.0,309.0,259.0,176.0,132.0,129.0]}],"unit":"count per year","note":"Row: \"Interruptions (count)\" (tab 13). PLN transmission lines – FALLBACK (no ENS published). Definitions differ by country; compare trends, not levels.","proj":null,"src":"tab 13","dp":0},"c_inv":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Grid investment per MWh","vals":[38385.99670510708,139425.0,98803.05416368408,57728.15390068637,110003.21528982474,64543.33835955503,63463.028187919466]}],"unit":"IDR/MWh of demand","note":"Grid investment (tab 16) ÷ Ember demand (tab 5), nominal. ","proj":null,"src":"tabs 5, 16","dp":1},"c_proj":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034],"series":[{"name":"Grid investment per MWh","vals":[38385.99670510708,139425.0,98803.05416368408,57728.15390068637,110003.21528982474,64543.33835955503,63463.028187919466,109839.81693363845,106695.56840077072,98083.94160583941,51979.121357111784,76125.28521053724,158767.77251184836,100932.83582089553,47752.808988764045,31902.4553198597,32502.011263073207]}],"unit":"IDR/MWh of demand","note":"History as in \"grid investment relative to demand\". Projection: RUPTL PLN 2025–2034 (May 2025), ARED scenario annual transmission investment (tab 33) ÷ projected demand (Ember level × plan growth, tab 7). Plan totals spread evenly over the plan period where no annual split is published.","proj":2024,"src":"tabs 7, 16, 33","dp":1},"u_proxy":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Average load ÷ transformer capacity","vals":[24.829221432710195,23.487618414492275,22.25969421079993,22.713633565859663,23.652295698624872,24.070019256495318,25.047399103403876]}],"unit":"% of transformer capacity","note":"Average hourly load (MW, tab 17) ÷ \"Transformer capacity Tiers 1+2 (EHV/HV and HV/MV)\" (MVA, tab 18). Higher = more intensive use of existing assets. MW and MVA are treated as equivalent (power factor of 1).","proj":null,"src":"tabs 17, 18","dp":0},"u_peak":{"xs":[2018,2019,2020,2021,2022,2023,2024],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,1.027,0.995,1.005,0.924,1.223,1.211]}],"unit":"index (2018=1)","note":"Peak demand growth ÷ annual demand growth, paired source (tab 24). Above 1 = peak growing faster than energy. Actual: Statistik PLN: peak load (sum of non-coincident system peaks) and energy sold","proj":null,"src":"tab 24","dp":3},"u_proj":{"xs":[2027,2028,2029,2030,2031,2032,2033,2034],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,0.994,0.993,0.994,0.995,0.989,0.981,0.982]}],"unit":"index (2027=1)","note":"Projected peak growth ÷ projected annual demand growth (tab 24). Projected: RUPTL PLN 2025-2034, Table 5.67 p.323: peak load and energy sales","proj":2027,"src":"tab 24","dp":3}},"Pakistan":{"ch_grid":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Total line length","vals":[22215.0,23317.0,24419.0,25522.0,26624.0,27726.0,28828.0,29930.0,31033.0,32135.0,33237.0]}],"unit":"","note":"NGC 220/500/765 kV + HVDC (1 per link)","proj":2025,"src":"tab 1"},"ch_res":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"RES-E share","vals":[25.7,30.2,30.4,29.3,31.3,36.7,41.1,46.8]}],"unit":"","note":"Renewables % of generation","proj":2025,"src":"tab 3"},"ch_acc":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045],"series":[{"name":"Access (total)","vals":[93.4,93.9,94.5,94.9,95.0,95.6,95.7,96.4,97.1,97.9,98.6,99.3,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0]}],"unit":"","note":"% of population with electricity","proj":2024,"src":"tab 4"},"ch_dem":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Annual demand","vals":[129.51,135.48,136.07,148.82,152.47,148.7,157.55,177.6,184.3,191.4,198.6,206.2,214.0,222.1,230.6,239.3,248.4,257.9]}],"unit":"TWh","note":"History: Ember (tab 5). Projection: Ember level grown at the plan's rate, IGCEP 2025-35 Rev2, medium growth (tab 7).","proj":2025,"src":"tabs 5, 7"},"ch_cons":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Consumption per capita","vals":[571.0,587.0,579.0,621.0,626.0,601.0,627.0,696.0,711.0,726.0,741.0,757.0,773.0,789.0,806.0,822.0,840.0,858.0]}],"unit":"kWh/capita","note":"Demand ÷ population (World Bank). Projection uses IGCEP 2025-35 Rev2, medium growth (tab 7).","proj":2025,"src":"tab 7"},"g_inv":{"xs":[2022,2023,2024],"series":[{"name":"Grid ÷ renewables","vals":[0.014728609675357919,0.012180070725814923,0.010799958736381022]}],"unit":"ratio","note":"NB grid investment is K-Electric (Karachi) only, not the national transmission system. Transmission investment (tab 16, PKR million) ÷ renewable power investment (tab 19, \"Renewable power investment – all technologies\", PKR million). Renewable investment is an estimate. ","proj":null,"src":"tabs 16, 19","dp":2},"g_plans":{"xs":[2022,2023,2024,2025],"series":[{"name":"ISP/IGCEP 2025–35 Rev.2, Reference case: Rationalized Capacity Addition with Low BAU demand","vals":[null,null,null,97.14285714285714]},{"name":"IGCEP 2024–34 (NTDC, submitted to NEPRA Apr 2024; not approved","vals":[null,null,78.28571428571428,86.85714285714286]},{"name":"IGCEP 2022–31, Base case: Normal demand","vals":[null,88.19875776397514,90.85714285714286,133.14285714285714]},{"name":"IGCEP 2021–30, Base case: Normal demand","vals":[84.10596026490066,90.6832298136646,107.99999999999999,126.28571428571429]}],"unit":"% of actual","note":"Renewable capacity assumed in each grid plan edition (tab 20) ÷ installed renewable capacity (Ember, tab 21), for years up to the latest actual. 100% = plan matched outturn; plan RES definitions may differ from Ember's.","proj":null,"src":"tabs 20, 21","dp":0},"g_path":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Latest grid plan","vals":[17.0,18.4,22.0,26.5,28.1,29.6,30.9,31.4,35.0,36.7,38.5]},{"name":"Policy pathway","vals":[null,null,null,null,null,null,null,null,null,null,38.5]}],"unit":"GW","note":"Basis: Total renewables. Plan: ISP/IGCEP 2025–35 Rev.2, Reference case: Rationalized Capacity Addition with Low BAU demand (tab 26). Policy: official – NDC 3.0 (submitted to UNFCCC Sep 2025), Table 1 High Priority Actions – adopts IGCEP 2025-35 (tab 27).","proj":2025,"src":"tabs 26, 27","dp":0},"f_curt":{"xs":[2020,2021,2022,2023,2024,2025],"series":[{"name":"Curtailment","vals":[0.4070058997050148,0.06695886716115981,0.027894736842105264,0.28292847503373825,0.8512412476129854,0.2777526821005082]}],"unit":"% of generation","note":"Curtailed GWh (tab 10) ÷ total generation (Ember, tab 11). CPPA-G system, wind + solar IPPs (non-project missed volume, NPMV)","proj":null,"src":"tabs 10, 11","dp":2},"f_src":{"xs":[2024,2025],"series":[{"name":"Flexibility ÷ wind + solar","vals":[1.2500000000000002,3.214285714285715]}],"unit":"% of wind + solar capacity","note":"Pumped hydro + batteries + import interconnection capacity (tab 22 \"Total\") ÷ installed wind and solar (tab 23). Only years where tab 22 has a total are shown.","proj":null,"src":"tabs 22, 23","dp":0},"f_plan":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Planned flexibility ÷ wind + solar","vals":[10.0,8.064516129032258,6.4102564102564115,15.957446808510637,13.888888888888888,13.008130081300811,11.764705882352942,11.347517730496454,9.876543209876544,9.756097560975611,9.580838323353294]}],"unit":"% of wind + solar capacity","note":"Planned flexibility (tab 28 \"Total\") ÷ wind + solar capacity in the latest grid plan (tab 26, standing in for \"Projected VRE\"). ISP/IGCEP 2025–35 Rev.2","proj":2025,"src":"tabs 26, 28","dp":0},"d_head":{"xs":[2022,2023,2024],"series":[{"name":"Transformer ÷ peak","vals":[2.9571730988438367,3.2041049030786772,3.0592569368239535]}],"unit":"× peak demand","note":"\"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18) ÷ actual peak demand (MW, tab 24). Tier 1: NGC (ex-NTDC) 500 and 220 kV grid-station transformers + K-Electric 220 kV; stock at 30 June","proj":null,"src":"tabs 18, 24","dp":2},"d_plans":{"xs":[2022,2023,2024,2025],"series":[{"name":"IGCEP 2024–34 (NTDC, submitted to NEPRA Apr 2024; not approved","vals":[null,null,100.0,91.13505148456096]},{"name":"IGCEP 2022–31, Base case: Normal demand","vals":[null,100.0,99.21049705326364,92.13234574088153]},{"name":"IGCEP 2021–30, Base case: Normal demand","vals":[100.0,107.35341140594899,113.18911414738626,105.01209634744878]}],"unit":"% of actual growth","note":"Demand growth assumed by each plan edition (tab 25) ÷ actual demand growth (Ember, tab 5), both indexed to the plan's first year. Growth is compared, not levels, because plan demand definitions differ from Ember's. Above 100% = plan expected more growth than happened.","proj":null,"src":"tabs 5, 25","dp":0},"d_path":{"xs":[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Latest grid plan","vals":[137.0,140.9,144.8,148.9,153.0,157.3,161.7,166.3,170.9,175.7,180.6]}],"unit":"TWh","note":"Plan: ISP/IGCEP 2025–35 Rev.2, Reference case: Rationalized Capacity Addition with Low BAU demand, energy, generation level (TWh) (tab 31). No policy pathway for demand in tab 27, so only the plan line is shown.","proj":2025,"src":"tabs 27, 31","dp":0},"r_ens":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"ENS per TWh","vals":[3621.34,841.45,127.14,874.88,61.65,926.03,28.44,15.6]}],"unit":"MWh per TWh of demand","note":"Energy not supplied ÷ Ember demand (tab 13). NTDC/NGC 500/220 kV system (excludes K-Electric)","proj":null,"src":"tab 13","dp":1},"c_cost":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Cost per MWh","vals":[15.02,10.4,98.13,24.66,36.56,215.48,643.52,162.68]}],"unit":"PKR/MWh of demand","note":"Congestion cost ÷ Ember demand (tab 15), nominal local currency. CPPA-G/NTDC system: out-of-merit cost due to transmission constraints + compensation to curtailed wind/solar IPPs (NPMV)","proj":null,"src":"tab 15","dp":2},"c_ratio":{"xs":[2022,2023,2024],"series":[{"name":"Congestion ÷ grid investment","vals":[45.379950343929345,230.26446280991735,392.0774198538227]}],"unit":"% of grid investment","note":"NB grid investment is K-Electric (Karachi) only, not the national transmission system. Congestion cost (tab 15, \"Congestion cost incl. curtailment compensation\", PKR million) ÷ grid investment (tab 16, PKR million), same currency.","proj":null,"src":"tabs 15, 16","dp":0},"c_inv":{"xs":[2022,2023,2024],"series":[{"name":"Grid investment per MWh","vals":[80.56994818652849,93.57767316745125,164.13202158045064]}],"unit":"PKR/MWh of demand","note":"NB grid investment is K-Electric (Karachi) only, not the national transmission system. Grid investment (tab 16) ÷ Ember demand (tab 5), nominal. ","proj":null,"src":"tabs 5, 16","dp":1},"c_proj":{"xs":[2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Grid investment per MWh","vals":[80.56994818652849,93.57767316745125,164.13202158045064,null,1621.2696690179057,1561.128526645768,1504.5317220543807,1449.078564500485,1396.2616822429907,1345.339936965331,1295.7502168256722,1248.6418721270372,1202.8985507246377,1158.5886002326483]}],"unit":"PKR/MWh of demand","note":"History as in \"grid investment relative to demand\". Projection: ISP/IGCEP 2025–35 Rev.2 (approved by NEPRA as part of ISP 2025-35, 11 Sep 2026); TSEP Addendum annual transmission investment (tab 33) ÷ projected demand (Ember level × plan growth, tab 7). Plan totals spread evenly over the plan period where no annual split is published.","proj":2024,"src":"tabs 7, 16, 33","dp":1},"u_proxy":{"xs":[2018,2019,2020,2021,2022,2023,2024,2025],"series":[{"name":"Average load ÷ transformer capacity","vals":[31.841481800559983,26.897391304347828,23.14507694606305,25.202492211838006,23.960627753303964,22.373797284829315,22.977197027927236,28.402913981507428]}],"unit":"% of transformer capacity","note":"Average hourly load (MW, tab 17) ÷ \"Transformer capacity Tier 1 (EHV/HV)\" (MVA, tab 18). Higher = more intensive use of existing assets. MW and MVA are treated as equivalent (power factor of 1).","proj":null,"src":"tabs 17, 18","dp":0},"u_peak":{"xs":[2022,2023,2024],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,1.025,1.089]}],"unit":"index (2022=1)","note":"Peak demand growth ÷ annual demand growth, paired source (tab 24). Above 1 = peak growing faster than energy. Actual: NEPRA State of Industry Report 2023/2024 (data from NTDC): Table 50 demand at NTDC system peak; Table 45 units received by NTDC at C","proj":null,"src":"tab 24","dp":3},"u_proj":{"xs":[2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035],"series":[{"name":"Peak ÷ demand growth","vals":[1.0,0.999,0.999,0.999,0.999,0.999,0.999,0.999,0.999,0.999,0.999,0.999]}],"unit":"index (2024=1)","note":"Projected peak growth ÷ projected annual demand growth (tab 24). Projected: IGCEP 2025-35 (Rev. 2, ISMO, Aug 2025), Table E1, Low BAU = reference case: gross energy and peak","proj":2024,"src":"tab 24","dp":3}}},"N":{"Germany":{"d_queue":"Tab 12 (demand queue volume) is not in the workbook.","d_plans":"No plan edition in tab 25 covers two or more years with actual demand.","r_ens":"Transmission ENS not published – see the fallback indicator in the drop-down."},"Poland":{"g_plans":"No grid plan edition in tab 20 covers a year with actual data (2018–2025).","d_queue":"Tab 12 (demand queue volume) is not in the workbook.","d_plans":"No plan edition in tab 25 covers two or more years with actual demand."},"South Korea":{"d_queue":"Tab 12 (demand queue volume) is not in the workbook.","r_ens":"Transmission ENS not published – see the fallback indicator in the drop-down."},"Indonesia":{"d_queue":"Tab 12 (demand queue volume) is not in the workbook.","r_ens":"Transmission ENS not published – see the fallback indicator in the drop-down.","c_cost":"NOT APPLICABLE / NOT PUBLISHED: vertically integrated single buyer (PLN) – no congestion-cost concept or published constraint cost (Statistik PLN, ESDM, RUPTL searched). Take-or-pay costs (~Rp40 tn 2023, DPR research note) reflect oversuppl","c_ratio":"NOT APPLICABLE / NOT PUBLISHED: vertically integrated single buyer (PLN) – no congestion-cost concept or published constraint cost (Statistik PLN, ESDM, RUPTL searched). Take-or-pay costs (~Rp40 tn 2023, DPR research note) reflect oversuppl"},"Pakistan":{"ch_stor":"No data: no historical storage series collected; TSEP addendum mentions only a pilot BESS at Jhimpir-I (no MW); no quantified storage in the plans extracted. Candidate: IGCEP 2025-35 storage assumptions (NEPRA blocked).","g_queue":"NOT PUBLISHED. Proxies: NEPRA (11 Sep 2026) excluded 640 MW of K-Electric RE projects from the ISP for lack of transmission (~5 yrs for the line); Sindh: 27 RE projects / 1,875 MW at approval stages; Gharo–Jhimpir wind corridor ~1,845 MW reportedly limited to ","d_queue":"Tab 12 (demand queue volume) is not in the workbook."}},"countries":["Germany","Poland","South Korea","Indonesia","Pakistan"]};</script>
+<script>
+(function(){
+'use strict';
+var G=window.GGAF,DATA=G.D,NOTES=G.N,CN=G.countries;
+function M(id,name,unit,dp,o){o=o||{};return {id:id,name:name,short:name,unit:unit,dp:dp,fb:!!o.fb,yr:o.yr||null};}
+var COL={cur:{h:'Constraint metric',q:'Is the grid currently a constraint?'},drv:{h:'Possible driver',q:'What is the possible reason?'},fut:{h:'Future risk',q:'Is there a risk it becomes a constraint in future?'}};
+var THINGS=[
+ {id:'gen',tag:'1. New generation',title:'Grid readiness for new generation',
+  cur:[M('g_queue','Generation in grid connection queue','GW',1),M('g_queue_rel','Generation in grid connection queue relative to installed generation capacity','% of installed generation capacity',0)],
+  drv:[M('g_inv','Ratio of grid investment to renewable investment','ratio',2),M('g_plans','Renewables in grid plans vs actual renewable deployment','% of actual',0)],
+  fut:[M('g_path','Renewables in latest grid plan vs policy pathway','GW',0)]},
+ {id:'flex',tag:'2. Flexibility',title:'Flexibility for renewable generation',
+  cur:[M('f_curt','Curtailment as a share of generation','% of generation',2)],
+  drv:[M('f_src','Flexibility sources relative to variable renewables','% of wind + solar capacity',0)],
+  fut:[M('f_plan','Planned flexibility sources relative to variable renewables','% of wind + solar capacity',0)]},
+ {id:'dem',tag:'3. New demand',title:'Grid readiness for new demand',
+  cur:[M('d_queue','Demand in grid connection queue','GW',1)],
+  drv:[M('d_head','Grid headroom proxy (transformer capacity relative to peak demand)','× peak demand',2),M('d_plans','Demand in grid plans vs actual demand growth','% of actual growth',0)],
+  fut:[M('d_path','Demand in latest grid plan vs policy pathway','TWh',0)]},
+ {id:'rel',tag:'4. Reliability',title:'Reliability of grid service',
+  cur:[M('r_ens','Energy not supplied','MWh per TWh of demand',1),M('r_inc','Transmission incidents or forced outages (fallback)','count per year',0,{fb:true})],drv:[],fut:[]},
+ {id:'cong',tag:'5. Remedial actions',title:'Sufficient grid development to avoid costly remedial actions',
+  cur:[M('c_cost','Congestion management costs per unit of demand','local currency per MWh',2),M('c_ratio','Congestion management cost relative to grid investment','% of grid investment',0)],
+  drv:[M('c_inv','Grid investment relative to demand','local currency per MWh',1)],
+  fut:[M('c_proj','Planned grid investment relative to demand','local currency per MWh',1)]},
+ {id:'util',tag:'6. Overbuild',title:'Use of the existing grid to avoid overbuild',
+  cur:[M('u_proxy','Network utilisation proxy (average load relative to transformer capacity)','% of transformer capacity',0)],
+  drv:[M('u_peak','Peak demand growth relative to annual demand growth','index',3)],
+  fut:[M('u_proj','Projected peak demand growth relative to annual demand growth','index',3)]}
+];
+function cname(){return CN[state.country];}
+function build(ci,thing,m){var d=DATA[CN[ci]][m.id];return d||null;}
+function why(ci,id){return (NOTES[CN[ci]]||{})[id]||'No data for this indicator in the workbook.';}
+/* ---------- helpers ---------- */
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function dpFor(m,d){return d&&d.dp!=null?d.dp:m.dp;}
+function nf(v,dp){var a=Math.abs(v);if(dp>0&&a>=1000)dp=0;if(a>0&&a<0.1)dp=Math.max(dp,3);return v.toLocaleString('en-GB',{minimumFractionDigits:dp,maximumFractionDigits:dp});}
+function sgn(d){return d>0?'+':(d<0?'−':'');}
+function unitOf(m,d){return d&&d.unit?d.unit:m.unit;}
+function lastIdx(vals){for(var i=vals.length-1;i>=0;i--)if(vals[i]!=null)return i;return -1;}
+function prevIdx(vals,i){for(var j=i-1;j>=0;j--)if(vals[j]!=null)return j;return -1;}
+/* ---------- chart ---------- */
+function pts(d){var n=0;d.series.forEach(function(s){s.vals.forEach(function(v){if(v!=null)n++;});});return n;}
+function colChart(m,d){
+  var dp=dpFor(m,d),u=unitOf(m,d),se=d.series[0],i=lastIdx(se.vals),v=se.vals[i],yr=d.xs[i],proj=d.proj!=null&&yr>=d.proj;
+  var W=440,H=250,L=52,R=60,T=28,B=34,iw=W-L-R,ih=H-T-B,mn=Math.min(0,v),mx=Math.max(0,v);if(m.yr){mn=m.yr[0];mx=m.yr[1];}else mx=mx*1.15||1;
+  function Y(x){return T+ih-(x-mn)/(mx-mn)*ih;}
+  var raw=(mx-mn)/3,mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)),rr=raw/mag,stp=mag*(rr<1.5?1:(rr<3?2:(rr<7?5:10))),tdp=stp<1?Math.min(3,Math.ceil(-Math.log(stp)/Math.LN10-1e-9)):0;
+  var s='<svg class="lc" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(m.name+': '+nf(v,dp)+' '+u+' in '+yr+' (single data point)')+'">';
+  for(var tv=Math.ceil(mn/stp)*stp;tv<=mx+1e-9;tv+=stp){var y=Y(tv);s+='<line class="grid" x1="'+L+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'"/><text x="'+(L-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end">'+nf(tv,tdp)+'</text>';}
+  var bw=64,cx=L+iw/2,y0=Y(0),yv=Y(v);
+  s+='<rect class="'+(proj?'colp':'col')+'" x="'+(cx-bw/2)+'" y="'+Math.min(y0,yv).toFixed(1)+'" width="'+bw+'" height="'+Math.abs(y0-yv).toFixed(1)+'"><title>'+yr+' '+esc(se.name)+': '+nf(v,dp)+' '+esc(u)+'</title></rect>';
+  s+='<line class="axis" x1="'+L+'" y1="'+y0.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y0.toFixed(1)+'"/>';
+  s+='<text class="val" x="'+cx+'" y="'+(yv-8).toFixed(1)+'" text-anchor="middle">'+nf(v,dp)+'</text><text x="'+cx+'" y="'+(T+ih+18)+'" text-anchor="middle">'+yr+(proj?' (projected)':'')+'</text>';
+  return s+'</svg>';
+}
+function chart(m,d){
+  if(pts(d)===1)return colChart(m,d);
+  var dp=dpFor(m,d),u=unitOf(m,d),ns=d.series.length,multi=ns>1,W=440,H=250,L=52,R=multi?96:60,T=28,B=34,n=d.xs.length,iw=W-L-R,ih=H-T-B;
+  var all=[];d.series.forEach(function(s){s.vals.forEach(function(v){if(v!=null)all.push(v);});});
+  var mn=Math.min.apply(null,all),mx=Math.max.apply(null,all);if(mn>0&&mn<mx*0.35)mn=0;if(mx===mn){var e=Math.abs(mx)*.2||1;mx+=e;mn-=e;if(all[0]>=0&&mn<0)mn=0;}var pad=(mx-mn)*.12;if(mn!==0)mn-=pad;mx+=pad;if(m.yr){mn=m.yr[0];mx=m.yr[1];}
+  function X(i){return n===1?L+iw/2:L+i*iw/(n-1);}function Y(v){return T+ih-(v-mn)/(mx-mn)*ih;}
+  var pi=d.proj==null?-1:d.xs.indexOf(d.proj);
+  var lab=d.series.map(function(se){var li=lastIdx(se.vals);return se.name+' '+nf(se.vals[li],dp)+' in '+d.xs[li];}).join('; ');
+  var s='<svg class="lc" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(m.name+' ('+u+'): '+lab)+'">';
+  if(pi>=0){var zx=pi===0?L:X(pi);s+='<rect class="zone" x="'+zx.toFixed(1)+'" y="'+T+'" width="'+(W-R-zx).toFixed(1)+'" height="'+ih+'"/><text x="'+(zx+6).toFixed(1)+'" y="'+(T+12)+'">Projected</text>';}
+  var raw=(mx-mn)/3,mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)),rr=raw/mag,stp=mag*(rr<1.5?1:(rr<3?2:(rr<7?5:10))),tdp=stp<1?Math.min(3,Math.ceil(-Math.log(stp)/Math.LN10-1e-9)):0;
+  var tl=[];for(var tv0=Math.ceil(mn/stp)*stp;tv0<=mx+1e-9;tv0+=stp){tl.push(tv0);}
+  tl.forEach(function(tv){var y=Y(tv);s+='<line class="grid" x1="'+L+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'"/><text x="'+(L-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end">'+nf(tv,tdp)+'</text>';});
+  s+='<line class="axis" x1="'+L+'" y1="'+(T+ih)+'" x2="'+(W-R)+'" y2="'+(T+ih)+'"/>';
+  var step=n>18?4:(n>9?2:1);d.xs.forEach(function(y,i){if(i%step===0||i===n-1&&(n-1)%step>step/2)s+='<text x="'+X(i).toFixed(1)+'" y="'+(T+ih+18)+'" text-anchor="middle">'+y+'</text>';});
+  var used=[];
+  d.series.forEach(function(se,k){
+    var cls=String(k%4+1),solid='',dash='',ps=null,pd=null;
+    se.vals.forEach(function(v,i){
+      if(v==null)return;
+      var pt=X(i).toFixed(1)+' '+Y(v).toFixed(1)+' ';
+      if(pi<0||i<=pi){solid+=(ps==null?'M':'L')+pt;ps=i;}else ps=null;
+      if(pi>=0&&i>=pi){dash+=(pd==null?'M':'L')+pt;pd=i;}
+    });
+    if(solid) s+='<path class="s'+cls+'" d="'+solid+'"/>';
+    if(dash) s+='<path class="s'+cls+' dash" d="'+dash+'"/>';
+    var li=lastIdx(se.vals);
+    se.vals.forEach(function(v,i){
+      if(v==null)return;var proj=pi>=0&&i>pi,last=i===li;
+      s+='<rect class="'+(proj?'h':'p')+cls+'" x="'+(X(i)-(last?4.5:3.5)).toFixed(1)+'" y="'+(Y(v)-(last?4.5:3.5)).toFixed(1)+'" width="'+(last?9:7)+'" height="'+(last?9:7)+'"><title>'+d.xs[i]+' '+esc(se.name)+': '+nf(v,dp)+' '+esc(u)+'</title></rect>';
+    });
+    var lv=se.vals[li],ly=Y(lv);
+    for(var t=0;t<used.length;t++){if(Math.abs(used[t]-ly)<22){ly=used[t]+(ly>=used[t]?22:-22);}}
+    used.push(ly);
+    s+='<text class="val" x="'+(X(li)+10).toFixed(1)+'" y="'+(ly+(multi?-1:4)).toFixed(1)+'">'+nf(lv,dp)+'</text>'+(multi?'<text x="'+(X(li)+10).toFixed(1)+'" y="'+(ly+11).toFixed(1)+'">'+esc(se.name.length>16?se.name.slice(0,15)+'…':se.name)+'</text>':'');
+  });
+  return s+'</svg>';
+}
+function legend(d){
+  if(d.series.length<2)return '';
+  return '<p class="legend">'+d.series.map(function(se,k){return '<span><i class="lg c'+(k%4+1)+'"></i>'+esc(se.name)+'</span>';}).join('')+'</p>';
+}
+function caption(m,d){
+  var dp=dpFor(m,d),u=unitOf(m,d);
+  if(d.series.length>1){
+    return '<p class="capt">'+d.series.map(function(se){var li=lastIdx(se.vals);return esc(se.name)+': '+nf(se.vals[li],dp)+' in '+d.xs[li];}).join(' · ')+'</p>';
+  }
+  var a=d.series[0].vals,li=lastIdx(a),fi=a.findIndex(function(v){return v!=null;});
+  if(fi===li) return '<p class="capt">'+nf(a[li],dp)+' '+esc(u)+' in '+d.xs[li]+' (single data point)</p>';
+  var dd=+(a[li]-a[fi]).toFixed(dp);
+  return '<p class="capt">'+nf(a[li],dp)+' '+esc(u)+' in '+d.xs[li]+' · '+(dd===0?'no change':sgn(dd)+nf(Math.abs(dd),dp))+' since '+d.xs[fi]+'</p>';
+}
+function noteBlock(d){return '<details class="mnote"><summary>How this is calculated</summary><p>'+esc(d.note)+'</p><p class="srcline">Workbook: '+esc(d.src)+'</p></details>';}
+function emptyBlock(ci,id){return '<div class="empty">Data not reported</div>';}
+
+var INTERP={
+ g_queue:'Shows how much new generation capacity has applied for a grid connection but is not yet connected. A large or growing queue suggests the grid is not connecting new projects as fast as developers want to build them. Queues also contain speculative projects that will never be built, so a large queue is a warning sign rather than proof of a constraint. Queue definitions differ by country (some include storage or loads, some count only certain stages), so compare the size and direction within a country rather than levels across countries.',
+ g_queue_rel:'Puts the queue in proportion by comparing it with the generation capacity already connected. A value of 20% means the queue would grow the fleet by a fifth if every project connected; values near or above 100% mean the queue is as large as the whole existing system, which points to a serious connection bottleneck or a lot of speculative applications. This makes countries of different sizes easier to compare, but queue definitions still differ.',
+ g_inv:'Shows how much is spent on the grid for every unit spent on new renewable power plants. A low or falling ratio can mean grid investment is not keeping pace with generation investment, which tends to show up later as connection queues, congestion and curtailment. There is no single right value: it depends on how much of the grid already exists and where new plants are built. Read the trend within a country, and note where the grid figure is not transmission-only.',
+ g_plans:'Compares the renewable capacity each grid plan assumed with what was actually installed in the same year. Around 100% means the plan anticipated deployment well. Below 100% means renewables grew faster than the grid plan assumed, so the grid was planned for too little; above 100% means the plan expected more than was built. Persistent under-estimates are a sign that grid planning lags behind the energy transition. Each line is one plan edition.',
+ g_path:'Compares the renewable capacity assumed in the latest grid plan with the government\'s policy pathway. If the plan line sits below the policy line, the grid is being planned for less renewable capacity than policy targets require, which is a risk that the grid becomes a bottleneck for meeting those targets. A plan above the pathway suggests the grid plan is more ambitious than official targets. Check that both lines cover the same years before drawing conclusions.',
+ f_curt:'Shows the share of electricity generation that was available but turned down, mostly wind and solar, because the grid or system could not use it. Rising curtailment is a direct sign that the grid or the system\'s flexibility is not keeping up with renewables. Some curtailment is economically efficient, so a low non-zero level is not a problem in itself; the trend and the speed of change matter most. Countries count curtailment differently (for example, whether market-based curtailment is included).',
+ f_src:'Compares the main sources of flexibility (pumped hydro, batteries and import interconnection) with installed wind and solar capacity. A falling share means variable renewables are growing faster than the system\'s ability to shift or move their output, which raises the risk of curtailment. Demand response and flexible thermal plants are not counted, so this understates total flexibility, especially in systems with a lot of hydro or gas.',
+ f_plan:'Shows whether planned storage and interconnection keep pace with the wind and solar capacity in the latest grid plan. A falling share over the plan horizon means flexibility is planned to grow more slowly than variable renewables, a risk of higher curtailment in future. Compare it with the current value in the "Possible driver" column to see whether plans improve or worsen the situation.',
+ d_queue:'Shows how much new demand (for example data centres, industry, electrified heat and transport) is waiting for a grid connection. A large or growing queue suggests the grid cannot connect new users as fast as they want to connect, which can slow electrification and economic investment.',
+ d_head:'Compares transformer capacity at transmission substations with peak demand. A higher number means more spare capacity to connect new demand; a falling number means peak demand is catching up with the substation capacity that serves it. It is a rough, national proxy: headroom can be scarce in specific places even when the national ratio looks comfortable, and transformer coverage (which voltage tiers are included) differs by country.',
+ d_plans:'Compares how much demand growth each grid plan expected with the growth that actually happened, both indexed to the plan\'s first year. Around 100% means the plan anticipated demand well. Below 100% means demand grew faster than planned, so the grid risks falling behind; above 100% means the plan expected more growth than happened, which risks building ahead of need. Each line is one plan edition.',
+ d_path:'Compares the demand assumed in the latest grid plan with the policy pathway for electricity demand. If the plan is below the policy line, the grid is being planned for less electrification than policy expects. Demand definitions often differ between plans and policy documents (gross vs net, national vs utility sales), so a gap may partly reflect definitions rather than ambition.',
+ r_ens:'Shows electricity demand that went unserved because of events on the transmission network, per TWh of demand. Lower is better. Values can jump from year to year because a single large incident can dominate, so look at the pattern over several years rather than one year.',
+ r_inc:'A fallback where energy not supplied is not published: the number of transmission incidents or forced outages per year. A rising count can signal a network under stress or ageing assets, but counts do not show how much demand was affected, and definitions and reporting change over time. Compare the trend within a country, not levels between countries.',
+ c_cost:'Shows how much is spent managing grid congestion (redispatch, countertrading, constraint payments and similar) for every MWh of demand. Rising costs are a sign that the grid is too weak in the places where power needs to flow, and that consumers are paying for it. Values are in nominal local currency, so compare trends within a country rather than levels across countries.',
+ c_ratio:'Compares congestion management costs with grid investment in the same year. A high or rising share means a lot of money is being spent working around grid constraints relative to fixing them, which suggests more grid build would pay for itself. Both values are in the same currency, so this ratio can be compared across countries, subject to differences in what each country counts as congestion cost and grid investment.',
+ c_inv:'Shows grid investment per MWh of demand. Rising values mean investment is growing faster than demand, which is expected in a period of catch-up or rapid electrification. Low or flat values while congestion costs and queues rise suggest under-investment. Values are in nominal local currency, so compare trends within a country, and note where the investment figure is not transmission-only.',
+ c_proj:'Continues grid investment per MWh of demand into the future using the latest grid plan. If the projected line is above recent history, the plan steps up investment; if it falls, planned investment grows more slowly than demand. Where a plan only gives a total, it is spread evenly over the plan period, so year-to-year shape is not meaningful, only the average level.',
+ u_proxy:'Shows average load as a share of transformer capacity at transmission substations. A higher number means the existing grid is used more intensively; a lower number means more capacity sits idle on average. Low values can point to over-build or very peaky demand (capacity is sized for peaks, not the average); high values mean little spare capacity and less room to absorb growth. A rising trend means demand is growing faster than substation capacity. This is a national proxy, and which voltage tiers are counted as transformer capacity differs by country.',
+ u_peak:'Compares how fast peak demand has grown with how fast annual demand has grown, indexed to 1 in the first year. Above 1 means peaks are growing faster than total energy use, so more grid capacity is needed for each extra unit of energy. Below 1 means demand is getting flatter, so the existing grid can carry more energy without extra capacity.',
+ u_proj:'The same comparison as the possible driver, using projections. A line rising above 1 means demand is expected to become peakier, so the grid will need to grow faster than energy demand; a flat or falling line means growth in energy can be served more efficiently by the existing grid, for example through flexibility.'
+};
+function interpBlock(id){return INTERP[id]?'<details class="mnote"><summary>How to interpret this data</summary><p>'+esc(INTERP[id])+'</p></details>':'';}
+/* ---------- state ---------- */
+var state={country:0,tab:{},open:{sum:true,chars:true,gen:true,flex:true,dem:true,rel:true,cong:true,util:true}};
+function tabIdx(thing,col,list){
+  var key=state.country+'|'+thing.id+'|'+col;
+  if(state.tab[key]!=null) return state.tab[key];
+  for(var i=0;i<list.length;i++){if(build(state.country,thing,list[i]))return i;}return 0;
+}
+function column(thing,col,list,anySel){
+  var c=COL[col],h='<div class="colx"><h3>'+c.h+'</h3><p class="sub">'+c.q+'</p>';
+  if(!list.length) return h+'<div class="empty">The framework lists no metric here.</div></div>';
+  var ti=tabIdx(thing,col,list),m=list[ti],sid='ind-'+thing.id+'-'+col;
+  if(list.length>1){
+    h+='<div class="indbox"><label class="indlab" for="'+sid+'">Indicator ('+list.length+' available)</label><select class="indsel" id="'+sid+'" data-ind="'+thing.id+'|'+col+'" data-fid="'+sid+'">'+
+      list.map(function(x,i){return '<option value="'+i+'"'+(i===ti?' selected':'')+'>'+esc(x.name)+(build(state.country,thing,x)?'':' (data not reported)')+'</option>';}).join('')+'</select></div>';
+  } else if(anySel) h+='<div class="indbox" aria-hidden="true"></div>';
+  var d=build(state.country,thing,m);
+  h+='<p class="mtitle">'+esc(m.name)+'</p><p class="munit">'+esc(unitOf(m,d))+(d?' · '+d.xs[0]+(d.xs.length>1?'–'+d.xs[d.xs.length-1]:''):'')+'</p>';
+  h+=d?chart(m,d)+legend(d)+caption(m,d)+interpBlock(m.id)+noteBlock(d):emptyBlock(state.country,m.id)+interpBlock(m.id);
+  return h+'</div>';
+}
+/* ---------- country characteristics ---------- */
+var RATC='Contextual indicator for power system and policy direction',RATP='COP29 pledge';
+function CM(id,name,unit,dp,yr){return {id:id,name:name,short:name,unit:unit,dp:dp,fb:false,yr:yr||null};}
+var CHARS=[
+ {id:'ch_grid',rat:RATP,m:CM('ch_grid','Length of transmission grid','circuit-km',0)},
+ {id:'ch_stor',rat:RATP,m:CM('ch_stor','Storage capacity','GW',1)},
+ {id:'ch_res',rat:RATC,m:CM('ch_res','Renewable electricity share','% of generation',1,[0,100])},
+ {id:'ch_acc',rat:RATC,m:CM('ch_acc','Access','% of population',1,[0,100])},
+ {id:'ch_dem',rat:RATC,m:CM('ch_dem','Annual demand','TWh',0)},
+ {id:'ch_cons',rat:RATC,m:CM('ch_cons','Consumption per capita','kWh/capita',0)}
+];
+function charCard(ch){
+  var m=ch.m,d=DATA[cname()][m.id],h='<div class="colx"><h3>'+esc(m.name)+'</h3><p class="rat">Rationale: '+esc(ch.rat)+'</p>';
+  h+='<p class="munit">'+esc(d&&d.unit?d.unit:m.unit)+(d?' · '+d.xs[0]+'–'+d.xs[d.xs.length-1]:'')+'</p>';
+  h+=d?chart(m,d)+caption(m,d)+noteBlock(d):emptyBlock(state.country,m.id);
+  return h+'</div>';
+}
+/* ---------- summary tiles ---------- */
+function headline(t){
+  for(var i=0;i<t.cur.length;i++){if(build(state.country,t,t.cur[i]))return t.cur[i];}
+  return t.cur[0];
+}
+var HINTS={
+ g_queue:'The higher the number, the more generation capacity is waiting for a grid connection.',
+ f_curt:'The higher the number, the larger the share of generation being curtailed instead of used.',
+ d_queue:'The higher the number, the more new demand is waiting for a grid connection.',
+ r_ens:'The higher the number, the more electricity demand went unserved because of transmission events.',
+ r_inc:'Fallback where energy not supplied is not published. Compare the trend, not the level.',
+ c_cost:'The higher the number, the more it costs, per MWh of demand, to manage grid congestion. Local currency, so not comparable across countries.',
+ c_ratio:'The higher the number, the more is spent on congestion management relative to grid investment.',
+ u_proxy:'The higher the number, the more intensively the existing transformer capacity is used on average.'
+};
+function sumTile(t){
+  var m=headline(t),d=build(state.country,t,m),hint=HINTS[m.id]||'';
+  var a='<a class="sumtile'+(d?'':' nod')+'" href="#thing-'+t.id+'" data-jump="'+t.id+'"';
+  var u=unitOf(m,d);
+  var left='<span class="sumleft"><span class="sumname">'+esc(m.name)+'</span>'+(hint?'<span class="sumhint">'+esc(hint)+'</span>':'')+'<span class="sumunit">Unit: '+esc(u)+'</span></span>';
+  if(!d) return a+' aria-label="'+esc(m.name+': data not reported')+'">'+left+'<span class="sumright"><span class="sumnum na">n/a</span><span class="sumchg">Data not reported</span></span></a>';
+  var v=d.series[0].vals,dp=dpFor(m,d),li=lastIdx(v),pj=prevIdx(v,li),cur=v[li],yr=d.xs[li],chg,spoken;
+  if(pj<0||v[pj]===0){chg=yr+' · no earlier value';spoken=chg;}
+  else{var yp=d.xs[pj],r=+((cur-v[pj])/Math.abs(v[pj])*100).toFixed(1);
+    chg=yr+' · '+(r===0?'no change vs '+yp:(r>0?'▲':'▼')+' '+sgn(r)+nf(Math.abs(r),1)+'% vs '+yp);
+    spoken=yr+', '+(r===0?'no change':(r>0?'up ':'down ')+nf(Math.abs(r),1)+'%')+' vs '+yp;}
+  return a+' aria-label="'+esc(m.name+': '+nf(cur,dp)+' '+u+', '+spoken+'. '+hint)+'">'+left+'<span class="sumright"><span class="sumnum">'+nf(cur,dp)+'</span><span class="sumchg">'+chg+'</span></span></a>';
+}
+/* ---------- coverage ---------- */
+function coverage(ci){
+  var ids=[];THINGS.forEach(function(t){t.cur.concat(t.drv,t.fut).forEach(function(m){if(!m.fb)ids.push(m.id);});});
+  var have=ids.filter(function(id){return DATA[CN[ci]][id];}).length;
+  var ch=CHARS.filter(function(c){return DATA[CN[ci]][c.id];}).length;
+  return have+' of '+ids.length+' assessment indicators and '+ch+' of 6 country characteristics have data.';
+}
+/* ---------- collapsible sections ---------- */
+var CHEV='<svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true"><polyline points="4,8 12,16 20,8"/></svg>';
+function accHead(id,label,title,sub){
+  var open=!!state.open[id];
+  return '<h2 class="acc-h"><button type="button" class="acc-btn" data-acc="'+id+'" data-fid="acc-'+id+'" aria-expanded="'+open+'" aria-controls="body-'+id+'"><span>'+(label?'<span class="ovmod">'+label+'</span>':'')+'<span class="acc-title">'+title+'</span>'+(sub?'<span class="acc-sub">'+sub+'</span>':'')+'</span>'+CHEV+'</button></h2>';
+}
+/* ---------- render ---------- */
+function render(){
+  var f=document.activeElement&&document.activeElement.getAttribute&&document.activeElement.getAttribute('data-fid');
+  $('#cdesc').textContent=cname()+': '+coverage(state.country);
+  $('#controls').innerHTML='<div class="ctl"><label for="sel-country">Country</label><select id="sel-country" data-fid="sel-country">'+CN.map(function(c,i){return '<option value="'+i+'"'+(i===state.country?' selected':'')+'>'+esc(c)+'</option>';}).join('')+'</select></div><div class="ctl"><span class="lab" id="all-lab">Sections</span><div class="chips" role="group" aria-labelledby="all-lab"><button type="button" class="chip" data-all="open" data-fid="all-open">Expand all</button><button type="button" class="chip" data-all="close" data-fid="all-close">Collapse all</button></div></div>';
+  $('#jump').innerHTML='<div class="jl"><a href="#sec-sum" data-jump="sum">Summary</a><a href="#sec-chars" data-jump="chars">Characteristics</a>'+THINGS.map(function(t){return '<a href="#thing-'+t.id+'" data-jump="'+t.id+'">'+esc(t.tag)+'</a>';}).join('')+'</div>';
+  var sumBody=state.open.sum?'<div class="accbody" id="body-sum"><div class="sumgrid">'+THINGS.map(sumTile).join('')+'</div></div>':'';
+  var charsBody=state.open.chars?'<div class="accbody" id="body-chars"><p class="pnote" style="margin:0 0 16px">Context for reading the grid assessment indicators below. These indicators are not assessed or scored.</p><div class="cards5">'+CHARS.map(charCard).join('')+'</div></div>':'';
+  $('#things').innerHTML='<section class="sec" id="sec-sum">'+accHead('sum','','Summary','One headline constraint metric per grid assessment: latest year, with the change from the previous data point')+sumBody+'</section>'+
+    '<section class="sec" id="sec-chars">'+accHead('chars','Context','Country characteristics','Six contextual indicators, not assessed or scored')+charsBody+'</section>'+
+    '<h2 class="grp">Grid assessment indicators</h2>'+
+    THINGS.map(function(t,i){
+      var anySel=t.cur.length>1||t.drv.length>1||t.fut.length>1;
+      var body=state.open[t.id]?'<div class="accbody" id="body-'+t.id+'"><div class="cols3">'+column(t,'cur',t.cur,anySel)+column(t,'drv',t.drv,anySel)+column(t,'fut',t.fut,anySel)+'</div></div>':'';
+      return '<section class="sec" id="thing-'+t.id+'">'+accHead(t.id,(i+1)+' of 6',esc(t.title),'')+body+'</section>';
+    }).join('');
+  if(f){var el=document.querySelector('[data-fid="'+f+'"]');if(el&&el.focus)el.focus({preventScroll:true});}
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest?e.target.closest('[data-acc],[data-all],[data-jump]'):null;if(!t)return;
+  if(t.hasAttribute('data-acc')){var id=t.getAttribute('data-acc');state.open[id]=!state.open[id];render();return;}
+  if(t.hasAttribute('data-all')){var o=t.getAttribute('data-all')==='open';Object.keys(state.open).forEach(function(k){state.open[k]=o;});render();return;}
+  if(t.hasAttribute('data-jump')){e.preventDefault();var jid=t.getAttribute('data-jump');state.open[jid]=true;render();var el=document.getElementById(jid==='chars'?'sec-chars':(jid==='sum'?'sec-sum':'thing-'+jid));if(el&&el.scrollIntoView)el.scrollIntoView({block:'start'});}
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.id==='sel-country'){state.country=+t.value;render();}
+  else if(t.hasAttribute&&t.hasAttribute('data-ind')){var p=t.getAttribute('data-ind').split('|');state.tab[state.country+'|'+p[0]+'|'+p[1]]=+t.value;render();}
+});
+render();
+})();
+</script>
+</body>
+</html>
+
+</body></html>
