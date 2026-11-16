@@ -45,12 +45,4 @@ The page uses tabs 1–5, 7–11, 13, 15–28, 31 and 33. Tab 12 (demand queue) 
 | 34 | Projected average hourly load |
 | 6 | Demand growth in national plans, indexed (the page uses tabs 25 and 31 for plan demand) |
 
-## Open questions
-
-- **Updates:** how is the page rebuilt from the workbook? A script that regenerates the data block would make updates repeatable and checkable.
-- **Unused tabs:** are tabs 35, 30 and 34 left out deliberately?
-- **Audience:** internal only for now. Publishing on Ember Labs would need validated data, licence checks for the sources, and the Labs checks (design system, frame embedding, analytics and user stories).
-
-## Viewing it
-
-This repo is private. To view the tool, download `index.html` and open it in a browser. GitHub Pages is off until the tool is approved for wider use.
+To view the tool, download `index.html` and open it in a browser. GitHub Pages is off until the tool is approved for wider use.
