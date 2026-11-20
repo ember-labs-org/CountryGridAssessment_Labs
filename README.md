@@ -46,3 +46,17 @@ The page uses tabs 1–5, 7–11, 13, 15–28, 31 and 33. Tab 12 (demand queue) 
 | 6 | Demand growth in national plans, indexed (the page uses tabs 25 and 31 for plan demand) |
 
 To view the tool, download `index.html` and open it in a browser. GitHub Pages is off until the tool is approved for wider use.
+
+## Ember Labs version
+
+The page follows Rey Dizon's Ember Labs design system (`ember-labs-branding` skill, v1). Lizzie's colours and type already followed it; the Labs pass changed:
+
+- **Removed what the Labs page provides:** the top bar with the Ember Labs logo, the header (Prototype badge, title, subtitle) and the footer.
+- **Type scale:** card and panel headings 22px (H6), introduction 20px, headline numbers 40px.
+- **Colour roles:** the definition of success in the introduction is white, not yellow (yellow is for numbers, controls and short labels).
+- **Controls:** Labs drop-downs (yellow chevron, navy option list), secondary buttons for Expand all / Collapse all and the jump links, and a yellow plus/minus on the method panels.
+- **Tidy-up:** removed leftover light-theme lines from an earlier template.
+
+All changes are in one block at the end of the stylesheet, so the original styles stay readable. The data is unchanged (590 of 590 values match the workbook).
+
+**Open design question:** line charts mark every point (filled = actual, hollow = projected). Rey's chart guidance is no per-point markers by default; projections are already shown as dashed lines on a shaded band. Kept for now: Lizzie's decision.
